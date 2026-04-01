@@ -1,0 +1,505 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//OtakuSync Spring 2026//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Netflix — OtakuSync Spring 2026
+X-WR-CALDESC:Netflix schedule via otakusync.net
+X-WR-TIMEZONE:America/Chicago
+X-APPLE-CALENDAR-COLOR:#E50914
+BEGIN:VEVENT
+UID:afab6608-0739-4236-b36a-228f243a3f6b@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260319
+DTEND;VALUE=DATE:20260320
+SUMMARY:🎬 🆕 JoJo's Bizarre Adventure: Steel Ball Run ⚔️ 🗺️ 🤠 👁️
+DESCRIPTION:🎬 ANIME — March 19\, 2026 ✨ PREMIERE\n\n📺 Netflix\n🎭 Action / Adventure / Western / Supernatural\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:a9c7cc29-cd70-4654-9686-171948147fef@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260326
+DTEND;VALUE=DATE:20260327
+SUMMARY:🎬 Ep 2 JoJo's Bizarre Adventure: Steel Ball Run ⚔️ 🗺️ 🤠 👁️
+DESCRIPTION:🎬 ANIME — March 26\, 2026\n\n📺 Netflix\n🎭 Action / Adventure / Western / Supernatural\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:3a10ff5d-4f39-4976-a88d-6ee81c51d2ee@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260402
+DTEND;VALUE=DATE:20260403
+SUMMARY:🎬 Ep 3 JoJo's Bizarre Adventure: Steel Ball Run ⚔️ 🗺️ 🤠 👁️
+DESCRIPTION:🎬 ANIME — April 02\, 2026\n\n📺 Netflix\n🎭 Action / Adventure / Western / Supernatural\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:6369f415-32de-49cf-8bda-5b71869d50cc@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260409
+DTEND;VALUE=DATE:20260410
+SUMMARY:🎬 Ep 4 JoJo's Bizarre Adventure: Steel Ball Run ⚔️ 🗺️ 🤠 👁️
+DESCRIPTION:🎬 ANIME — April 09\, 2026\n\n📺 Netflix\n🎭 Action / Adventure / Western / Supernatural\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:d6287119-1392-45af-b071-ede79f73318c@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260416
+DTEND;VALUE=DATE:20260417
+SUMMARY:🎬 Ep 5 JoJo's Bizarre Adventure: Steel Ball Run ⚔️ 🗺️ 🤠 👁️
+DESCRIPTION:🎬 ANIME — April 16\, 2026\n\n📺 Netflix\n🎭 Action / Adventure / Western / Supernatural\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:bc3968c4-1b67-4591-a91d-7a232bff6959@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260423
+DTEND;VALUE=DATE:20260424
+SUMMARY:🎬 Ep 6 JoJo's Bizarre Adventure: Steel Ball Run ⚔️ 🗺️ 🤠 👁️
+DESCRIPTION:🎬 ANIME — April 23\, 2026\n\n📺 Netflix\n🎭 Action / Adventure / Western / Supernatural\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:e303b9ee-25c6-43ce-a998-912b89d3d252@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260430
+DTEND;VALUE=DATE:20260501
+SUMMARY:🎬 Ep 7 JoJo's Bizarre Adventure: Steel Ball Run ⚔️ 🗺️ 🤠 👁️
+DESCRIPTION:🎬 ANIME — April 30\, 2026\n\n📺 Netflix\n🎭 Action / Adventure / Western / Supernatural\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:161a30ca-f707-4d8f-bbb2-59def971ef55@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260507
+DTEND;VALUE=DATE:20260508
+SUMMARY:🎬 Ep 8 JoJo's Bizarre Adventure: Steel Ball Run ⚔️ 🗺️ 🤠 👁️
+DESCRIPTION:🎬 ANIME — May 07\, 2026\n\n📺 Netflix\n🎭 Action / Adventure / Western / Supernatural\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:0615d905-3b0d-4796-a2ff-503100c3b5b6@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260514
+DTEND;VALUE=DATE:20260515
+SUMMARY:🎬 Ep 9 JoJo's Bizarre Adventure: Steel Ball Run ⚔️ 🗺️ 🤠 👁️
+DESCRIPTION:🎬 ANIME — May 14\, 2026\n\n📺 Netflix\n🎭 Action / Adventure / Western / Supernatural\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:548ddac3-c655-4ff4-a663-6dd92b1076d6@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260521
+DTEND;VALUE=DATE:20260522
+SUMMARY:🎬 Ep 10 JoJo's Bizarre Adventure: Steel Ball Run ⚔️ 🗺️ 🤠 👁️
+DESCRIPTION:🎬 ANIME — May 21\, 2026\n\n📺 Netflix\n🎭 Action / Adventure / Western / Supernatural\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:443e4e8f-7aaf-477b-9395-b9a78237d17a@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260528
+DTEND;VALUE=DATE:20260529
+SUMMARY:🎬 Ep 11 JoJo's Bizarre Adventure: Steel Ball Run ⚔️ 🗺️ 🤠 👁️
+DESCRIPTION:🎬 ANIME — May 28\, 2026\n\n📺 Netflix\n🎭 Action / Adventure / Western / Supernatural\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:63e32144-a43f-47de-a282-4ca45bd10b92@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260402
+DTEND;VALUE=DATE:20260403
+SUMMARY:🎬 🆕 The Ramparts of Ice ✨ 🎭 📜
+DESCRIPTION:🎬 ANIME — April 02\, 2026 ✨ PREMIERE\n\n📺 Netflix\n🎭 Fantasy / Drama / Historical\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:592d612f-5eeb-4e83-b933-e16e6b6f664e@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260409
+DTEND;VALUE=DATE:20260410
+SUMMARY:🎬 Ep 2 The Ramparts of Ice ✨ 🎭 📜
+DESCRIPTION:🎬 ANIME — April 09\, 2026\n\n📺 Netflix\n🎭 Fantasy / Drama / Historical\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:d6f1e634-5c77-4e1d-ac3b-515881d334e6@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260416
+DTEND;VALUE=DATE:20260417
+SUMMARY:🎬 Ep 3 The Ramparts of Ice ✨ 🎭 📜
+DESCRIPTION:🎬 ANIME — April 16\, 2026\n\n📺 Netflix\n🎭 Fantasy / Drama / Historical\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:ad16964e-bad2-4a98-97c4-0e76d0105dbf@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260423
+DTEND;VALUE=DATE:20260424
+SUMMARY:🎬 Ep 4 The Ramparts of Ice ✨ 🎭 📜
+DESCRIPTION:🎬 ANIME — April 23\, 2026\n\n📺 Netflix\n🎭 Fantasy / Drama / Historical\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:95603706-5175-4f67-8522-28dacde5dd20@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260430
+DTEND;VALUE=DATE:20260501
+SUMMARY:🎬 Ep 5 The Ramparts of Ice ✨ 🎭 📜
+DESCRIPTION:🎬 ANIME — April 30\, 2026\n\n📺 Netflix\n🎭 Fantasy / Drama / Historical\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:a7b04b8b-e753-408e-9d35-d5bb91345b4a@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260507
+DTEND;VALUE=DATE:20260508
+SUMMARY:🎬 Ep 6 The Ramparts of Ice ✨ 🎭 📜
+DESCRIPTION:🎬 ANIME — May 07\, 2026\n\n📺 Netflix\n🎭 Fantasy / Drama / Historical\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:b415ced7-0f30-4594-822e-798c8272affb@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260514
+DTEND;VALUE=DATE:20260515
+SUMMARY:🎬 Ep 7 The Ramparts of Ice ✨ 🎭 📜
+DESCRIPTION:🎬 ANIME — May 14\, 2026\n\n📺 Netflix\n🎭 Fantasy / Drama / Historical\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:d6fa59a7-53a9-437a-a5d5-2713df431ae6@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260521
+DTEND;VALUE=DATE:20260522
+SUMMARY:🎬 Ep 8 The Ramparts of Ice ✨ 🎭 📜
+DESCRIPTION:🎬 ANIME — May 21\, 2026\n\n📺 Netflix\n🎭 Fantasy / Drama / Historical\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:c2cc34c2-ead2-46f0-9978-b333eec4d7b9@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260528
+DTEND;VALUE=DATE:20260529
+SUMMARY:🎬 Ep 9 The Ramparts of Ice ✨ 🎭 📜
+DESCRIPTION:🎬 ANIME — May 28\, 2026\n\n📺 Netflix\n🎭 Fantasy / Drama / Historical\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:c0f3e98b-19a8-470d-8932-28dd1dc431dc@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260604
+DTEND;VALUE=DATE:20260605
+SUMMARY:🎬 Ep 10 The Ramparts of Ice ✨ 🎭 📜
+DESCRIPTION:🎬 ANIME — June 04\, 2026\n\n📺 Netflix\n🎭 Fantasy / Drama / Historical\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:ae651d90-59b6-4919-8b23-07f90f68fe95@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260611
+DTEND;VALUE=DATE:20260612
+SUMMARY:🎬 Ep 11 The Ramparts of Ice ✨ 🎭 📜
+DESCRIPTION:🎬 ANIME — June 11\, 2026\n\n📺 Netflix\n🎭 Fantasy / Drama / Historical\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:23d477bc-b523-4372-be9a-e22e9614d2a6@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260411
+DTEND;VALUE=DATE:20260412
+SUMMARY:🎬 🆕 Dandelion 👁️ 😄 🎭
+DESCRIPTION:🎬 ANIME — April 11\, 2026 ✨ PREMIERE\n\n📺 Netflix\n🎭 Supernatural / Comedy / Drama\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:174cf048-d699-41b0-aec5-025cf5f3b348@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260418
+DTEND;VALUE=DATE:20260419
+SUMMARY:🎬 Ep 2 Dandelion 👁️ 😄 🎭
+DESCRIPTION:🎬 ANIME — April 18\, 2026\n\n📺 Netflix\n🎭 Supernatural / Comedy / Drama\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:b0a18ff5-66a1-475c-b69a-405751378127@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260425
+DTEND;VALUE=DATE:20260426
+SUMMARY:🎬 Ep 3 Dandelion 👁️ 😄 🎭
+DESCRIPTION:🎬 ANIME — April 25\, 2026\n\n📺 Netflix\n🎭 Supernatural / Comedy / Drama\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:d10adf5a-ac35-44d2-a943-7f7aabeba023@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260502
+DTEND;VALUE=DATE:20260503
+SUMMARY:🎬 Ep 4 Dandelion 👁️ 😄 🎭
+DESCRIPTION:🎬 ANIME — May 02\, 2026\n\n📺 Netflix\n🎭 Supernatural / Comedy / Drama\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:53c6b55e-258b-4e7f-85c7-527dc1747343@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260509
+DTEND;VALUE=DATE:20260510
+SUMMARY:🎬 Ep 5 Dandelion 👁️ 😄 🎭
+DESCRIPTION:🎬 ANIME — May 09\, 2026\n\n📺 Netflix\n🎭 Supernatural / Comedy / Drama\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:8e5d9cbf-6f81-4eb5-857f-7af171d3b274@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260516
+DTEND;VALUE=DATE:20260517
+SUMMARY:🎬 Ep 6 Dandelion 👁️ 😄 🎭
+DESCRIPTION:🎬 ANIME — May 16\, 2026\n\n📺 Netflix\n🎭 Supernatural / Comedy / Drama\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:23a8f161-db04-404a-bf86-59bbf20f89a9@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260523
+DTEND;VALUE=DATE:20260524
+SUMMARY:🎬 Ep 7 Dandelion 👁️ 😄 🎭
+DESCRIPTION:🎬 ANIME — May 23\, 2026\n\n📺 Netflix\n🎭 Supernatural / Comedy / Drama\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:3bdf7ca3-a72e-4cc4-b6af-4bb12f822e53@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260530
+DTEND;VALUE=DATE:20260531
+SUMMARY:🎬 Ep 8 Dandelion 👁️ 😄 🎭
+DESCRIPTION:🎬 ANIME — May 30\, 2026\n\n📺 Netflix\n🎭 Supernatural / Comedy / Drama\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:9a2a6ba1-56e6-499a-accb-23cfc352fa4d@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260606
+DTEND;VALUE=DATE:20260607
+SUMMARY:🎬 Ep 9 Dandelion 👁️ 😄 🎭
+DESCRIPTION:🎬 ANIME — June 06\, 2026\n\n📺 Netflix\n🎭 Supernatural / Comedy / Drama\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:ef104987-fdc9-48f3-b18e-940c930805af@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260613
+DTEND;VALUE=DATE:20260614
+SUMMARY:🎬 Ep 10 Dandelion 👁️ 😄 🎭
+DESCRIPTION:🎬 ANIME — June 13\, 2026\n\n📺 Netflix\n🎭 Supernatural / Comedy / Drama\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:e52def75-1614-4af9-b963-fa95b66f0862@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260620
+DTEND;VALUE=DATE:20260621
+SUMMARY:🎬 Ep 11 Dandelion 👁️ 😄 🎭
+DESCRIPTION:🎬 ANIME — June 20\, 2026\n\n📺 Netflix\n🎭 Supernatural / Comedy / Drama\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:f704d470-13f5-4802-9a25-5d90b6b25366@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260418
+DTEND;VALUE=DATE:20260419
+SUMMARY:🎬 🆕 Rilakkuma (new series) ☕ 🧸 😄
+DESCRIPTION:🎬 ANIME — April 18\, 2026 ✨ PREMIERE\n\n📺 Netflix\n🎭 Slice-of-Life / Kids / Comedy\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:f6d0c946-6548-4dde-ad86-dc7686806869@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260425
+DTEND;VALUE=DATE:20260426
+SUMMARY:🎬 Ep 2 Rilakkuma (new series) ☕ 🧸 😄
+DESCRIPTION:🎬 ANIME — April 25\, 2026\n\n📺 Netflix\n🎭 Slice-of-Life / Kids / Comedy\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:b51dc466-a1c5-479f-8a8e-c0ab8e8ff4e2@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260502
+DTEND;VALUE=DATE:20260503
+SUMMARY:🎬 Ep 3 Rilakkuma (new series) ☕ 🧸 😄
+DESCRIPTION:🎬 ANIME — May 02\, 2026\n\n📺 Netflix\n🎭 Slice-of-Life / Kids / Comedy\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:d258b992-f9b2-4a0a-9869-8c2a53814363@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260509
+DTEND;VALUE=DATE:20260510
+SUMMARY:🎬 Ep 4 Rilakkuma (new series) ☕ 🧸 😄
+DESCRIPTION:🎬 ANIME — May 09\, 2026\n\n📺 Netflix\n🎭 Slice-of-Life / Kids / Comedy\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:2f244291-f4d0-41b4-b426-0a2b9f9777e8@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260516
+DTEND;VALUE=DATE:20260517
+SUMMARY:🎬 Ep 5 Rilakkuma (new series) ☕ 🧸 😄
+DESCRIPTION:🎬 ANIME — May 16\, 2026\n\n📺 Netflix\n🎭 Slice-of-Life / Kids / Comedy\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:9a648fe9-0d2a-4fa5-9f9d-f3c8a34d83e0@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260523
+DTEND;VALUE=DATE:20260524
+SUMMARY:🎬 Ep 6 Rilakkuma (new series) ☕ 🧸 😄
+DESCRIPTION:🎬 ANIME — May 23\, 2026\n\n📺 Netflix\n🎭 Slice-of-Life / Kids / Comedy\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:4cd0e253-9d7a-4906-918a-7a0e49e9893c@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260530
+DTEND;VALUE=DATE:20260531
+SUMMARY:🎬 Ep 7 Rilakkuma (new series) ☕ 🧸 😄
+DESCRIPTION:🎬 ANIME — May 30\, 2026\n\n📺 Netflix\n🎭 Slice-of-Life / Kids / Comedy\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:63841430-fbbf-4c43-b16a-c70b047370c4@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260606
+DTEND;VALUE=DATE:20260607
+SUMMARY:🎬 Ep 8 Rilakkuma (new series) ☕ 🧸 😄
+DESCRIPTION:🎬 ANIME — June 06\, 2026\n\n📺 Netflix\n🎭 Slice-of-Life / Kids / Comedy\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:9e6ab7a6-53b4-43a1-86bc-33031e27d32a@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260613
+DTEND;VALUE=DATE:20260614
+SUMMARY:🎬 Ep 9 Rilakkuma (new series) ☕ 🧸 😄
+DESCRIPTION:🎬 ANIME — June 13\, 2026\n\n📺 Netflix\n🎭 Slice-of-Life / Kids / Comedy\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:c35a48f3-13ff-463c-bb33-ead32f59ba76@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260620
+DTEND;VALUE=DATE:20260621
+SUMMARY:🎬 Ep 10 Rilakkuma (new series) ☕ 🧸 😄
+DESCRIPTION:🎬 ANIME — June 20\, 2026\n\n📺 Netflix\n🎭 Slice-of-Life / Kids / Comedy\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:62203df7-890a-4572-8913-e4e7f90ed944@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260627
+DTEND;VALUE=DATE:20260628
+SUMMARY:🎬 Ep 11 Rilakkuma (new series) ☕ 🧸 😄
+DESCRIPTION:🎬 ANIME — June 27\, 2026\n\n📺 Netflix\n🎭 Slice-of-Life / Kids / Comedy\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+BEGIN:VEVENT
+UID:e410e6f7-858d-46e9-ad6c-b9f902cc1836@otakusync
+DTSTAMP:20260401T013228Z
+DTSTART;VALUE=DATE:20260512
+DTEND;VALUE=DATE:20260513
+SUMMARY:🎬 🆕 Devil May Cry Season 2 ⚔️ 👁️ 🌑
+DESCRIPTION:🎬 ANIME — May 12\, 2026 ✨ PREMIERE\n\n📺 Netflix\n🎭 Action / Supernatural / Dark Fantasy\n\n─────────────────\notakusync.net
+CATEGORIES:Anime\,Spring 2026\,Netflix
+COLOR:tomato
+X-APPLE-CALENDAR-COLOR:#E50914
+END:VEVENT
+END:VCALENDAR

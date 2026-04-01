@@ -1,0 +1,65 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//OtakuSync Spring 2026//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Manhwa — OtakuSync Spring 2026
+X-WR-CALDESC:Manhwa schedule via otakusync.net
+X-WR-TIMEZONE:America/Chicago
+X-APPLE-CALENDAR-COLOR:#8B5CF6
+BEGIN:VEVENT
+UID:67eae893-26c3-45d5-bc47-4e1f1837abba@otakusync
+DTSTAMP:20260401T013327Z
+DTSTART;VALUE=DATE:20260324
+DTEND;VALUE=DATE:20260325
+SUMMARY:🇰🇷 Manhwa: 5 Releases Today
+DESCRIPTION:🇰🇷 MANHWA — March 24\, 2026 (5 releases)\n\n1. Solo Leveling Vol. 10 (Novel) Action / Fantasy / System / Overpowered [Light Novel] — Yen Press\n2. Omniscient Reader's Viewpoint Vol. 6 (Novel) Action / Fantasy / Regression / Psychological [Light Novel] — Yen Press\n3. His Little Amber Vol. 1 Romance / BL / Drama [Manhwa] — Seven Seas\n4. HOOL!GAN'S Vol. 2 Action / Sports / Drama [Manhwa] — Yen Press\n5. Oldboy Deluxe Edition Book Two HC Thriller / Drama / Dark [Manhwa] — Dark Horse\n\n─────────────────\notakusync.net
+CATEGORIES:Manhwa\,Spring 2026
+COLOR:grape
+X-APPLE-CALENDAR-COLOR:#8B5CF6
+END:VEVENT
+BEGIN:VEVENT
+UID:d24a9df2-3b4d-43b2-aa68-136bb1e06302@otakusync
+DTSTAMP:20260401T013327Z
+DTSTART;VALUE=DATE:20260331
+DTEND;VALUE=DATE:20260401
+SUMMARY:🇰🇷 Manhwa: 2 Releases Today
+DESCRIPTION:🇰🇷 MANHWA — March 31\, 2026 (2 releases)\n\n1. Grand Metal Organs Vol. 2 Action / Sci-Fi / Drama [Manhwa] — Seven Seas\n2. Omega Megaera Vol. 3 Romance / BL / Fantasy [Manhwa] — Yen Press\n\n─────────────────\notakusync.net
+CATEGORIES:Manhwa\,Spring 2026
+COLOR:grape
+X-APPLE-CALENDAR-COLOR:#8B5CF6
+END:VEVENT
+BEGIN:VEVENT
+UID:c581bbac-a3c9-45a5-b835-f0b732444247@otakusync
+DTSTAMP:20260401T013327Z
+DTSTART;VALUE=DATE:20260407
+DTEND;VALUE=DATE:20260408
+SUMMARY:🇰🇷 Manhwa: 10 Releases Today
+DESCRIPTION:🇰🇷 MANHWA — April 07\, 2026 (10 releases)\n\n1. Solo Leveling Vol. 12 (Manhwa) Action / Fantasy / System / Overpowered / Dungeon [Manhwa Volume] — Yen Press\n2. The Beginning After the End Vol. 14 Action / Fantasy / Isekai / Magic [Manhwa Volume] — Yen Press\n3. Eleceed Vol. 21 Action / Supernatural / School / Comedy [Manhwa Volume] — Yen Press\n4. Return of the Blossoming Blade Vol. 10 Action / Murim / Martial Arts [Manhwa Volume] — Yen Press\n5. Omniscient Reader's Viewpoint Vol. 4 (Manhwa) Action / Fantasy / Regression / Psychological [Manhwa Volume] — Yen Press\n6. I Tamed My Ex-Husband's Mad Dog Vol. 6 Romance / Fantasy / Villainess / Drama [Manhwa Volume] — Yen Press\n7. Finding Camellia Vol. 7 Romance / Historical / Drama / Villainess [Manhwa Volume] — Yen Press\n8. Hitting Rewind With You Vol. 2 Romance / Slice-of-Life / Comedy [Manhwa Volume] — Yen Press\n9. Tower of God Vol. 6 Action / Fantasy / Adventure [Manhwa Volume] — Yen Press\n10. Noblesse Omnibus Vol. 3 Action / Supernatural / School [Manhwa Volume] — Yen Press\n\n─────────────────\notakusync.net
+CATEGORIES:Manhwa\,Spring 2026
+COLOR:grape
+X-APPLE-CALENDAR-COLOR:#8B5CF6
+END:VEVENT
+BEGIN:VEVENT
+UID:ea8fe1cf-a6b8-458d-9a5e-679d0457cbab@otakusync
+DTSTAMP:20260401T013327Z
+DTSTART;VALUE=DATE:20260414
+DTEND;VALUE=DATE:20260415
+SUMMARY:🇰🇷 Manhwa: 8 Releases Today
+DESCRIPTION:🇰🇷 MANHWA — April 14\, 2026 (8 releases)\n\n1. Lost in the Cloud Vol. 3 Romance / BL / School / Drama [Manhwa Volume] — Seven Seas Webtoons\n2. Low Tide in Twilight Vol. 4 Romance / BL / Drama [Manhwa Volume] — Seven Seas Webtoons\n3. Painter of the Night Vol. 3 Romance / BL / Historical / Dark [Manhwa Volume] — Seven Seas Webtoons\n4. Our Sunny Days Vol. 1 Romance / BL / Slice-of-Life / Drama [Manhwa Volume] — Seven Seas Webtoons\n5. Perfect Buddy Vol. 6 Romance / Comedy / Slice-of-Life [Manhwa Volume] — Seven Seas Webtoons\n6. Colette Decides to Die Vol. 7 Romance / Fantasy / Villainess / Comedy [Manhwa Volume] — Yen Press\n7. I'm Running for Crown Princess But All I Want is a Steady Paycheck Vol. 3 Romance / Fantasy / Villainess / Comedy [Manhwa Volume] — Yen Press\n8. Solo Leveling: Ragnarok Vol. 3 Action / Fantasy / System / Sequel [Manhwa Volume] — Yen Press\n\n─────────────────\notakusync.net
+CATEGORIES:Manhwa\,Spring 2026
+COLOR:grape
+X-APPLE-CALENDAR-COLOR:#8B5CF6
+END:VEVENT
+BEGIN:VEVENT
+UID:6190da60-cc9b-40c6-b14d-980974206fda@otakusync
+DTSTAMP:20260401T013327Z
+DTSTART;VALUE=DATE:20260421
+DTEND;VALUE=DATE:20260422
+SUMMARY:🇰🇷 Manhwa: 5 Releases Today
+DESCRIPTION:🇰🇷 MANHWA — April 21\, 2026 (5 releases)\n\n1. Roses and Champagne Vol. 4 Romance / BL / Drama / Thriller [Manhwa Volume] — Seven Seas Webtoons\n2. It's Just a Dream... Vol. 4 Romance / BL / Fantasy [Manhwa Volume] — Seven Seas Webtoons\n3. The Greatest Wolf of My Life Vol. 2 Romance / Comedy / Supernatural [Manhwa Volume] — Seven Seas Webtoons\n4. Kaya-chan Isn't Scary Vol. 5 Romance / School / Comedy / Slice-of-Life [Manhwa Volume] — Yen Press\n5. The Fantasie of a Stepmother Vol. 6 Romance / Fantasy / Drama / Villainess [Manhwa Volume] — Seven Seas Webtoons\n\n─────────────────\notakusync.net
+CATEGORIES:Manhwa\,Spring 2026
+COLOR:grape
+X-APPLE-CALENDAR-COLOR:#8B5CF6
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,54 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//OtakuSync Spring 2026//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Manhua — OtakuSync Spring 2026
+X-WR-CALDESC:Manhua schedule via otakusync.net
+X-WR-TIMEZONE:America/Chicago
+X-APPLE-CALENDAR-COLOR:#10B981
+BEGIN:VEVENT
+UID:abc6674e-c092-4bf1-b3f9-1b2591cc45ed@otakusync
+DTSTAMP:20260401T013327Z
+DTSTART;VALUE=DATE:20260324
+DTEND;VALUE=DATE:20260325
+SUMMARY:🇨🇳 Manhua: 3 Releases Today
+DESCRIPTION:🇨🇳 MANHUA — March 24\, 2026 (3 releases)\n\n1. Grandmaster of Demonic Cultivation (Deluxe Novel) Vol. 4  [Novel (Deluxe)] — Seven Seas / Fanfare\n2. The Husky and His White Cat Shizun (Novel) Vol. 11  [Novel] — Seven Seas\n3. The Husky and His White Cat Shizun Vol. 11 (Special Edition)  [Novel (Special Ed.)] — Seven Seas\n\n─────────────────\notakusync.net
+CATEGORIES:Manhua\,Spring 2026
+COLOR:sage
+X-APPLE-CALENDAR-COLOR:#10B981
+END:VEVENT
+BEGIN:VEVENT
+UID:d8223c8e-8f71-4777-8a3a-e57846daa4c2@otakusync
+DTSTAMP:20260401T013327Z
+DTSTART;VALUE=DATE:20260407
+DTEND;VALUE=DATE:20260408
+SUMMARY:🇨🇳 Manhua: 3 Releases Today
+DESCRIPTION:🇨🇳 MANHUA — April 07\, 2026 (3 releases)\n\n1. Grandmaster of Demonic Cultivation (The Comic) Vol. 13  [Manhua Volume] — Seven Seas\n2. Heaven Official's Blessing (Tian Guan Ci Fu) Vol. 9  [Manhua Volume] — Seven Seas\n3. Copper Coins: Tong Qian Kan Shi (Novel) Vol. 3  [Novel] — Yen Press\n\n─────────────────\notakusync.net
+CATEGORIES:Manhua\,Spring 2026
+COLOR:sage
+X-APPLE-CALENDAR-COLOR:#10B981
+END:VEVENT
+BEGIN:VEVENT
+UID:3d17ac49-9740-43e9-b79f-31684fca1610@otakusync
+DTSTAMP:20260401T013327Z
+DTSTART;VALUE=DATE:20260414
+DTEND;VALUE=DATE:20260415
+SUMMARY:🇨🇳 Manhua: 3 Releases Today
+DESCRIPTION:🇨🇳 MANHUA — April 14\, 2026 (3 releases)\n\n1. The Scum Villain's Self-Saving System (Novel) Vol. 8  [Novel] — Seven Seas\n2. After the Disabled God of War Became My Concubine (Novel) Vol. 2  [Novel] — Seven Seas\n3. Record of Ragnarok (Chinese Edition) Vol. 18  [Manhua Volume] — Yen Press\n\n─────────────────\notakusync.net
+CATEGORIES:Manhua\,Spring 2026
+COLOR:sage
+X-APPLE-CALENDAR-COLOR:#10B981
+END:VEVENT
+BEGIN:VEVENT
+UID:724b9469-5545-4e85-88f5-024a6ad248a2@otakusync
+DTSTAMP:20260401T013327Z
+DTSTART;VALUE=DATE:20260421
+DTEND;VALUE=DATE:20260422
+SUMMARY:🇨🇳 Manhua: 3 Releases Today
+DESCRIPTION:🇨🇳 MANHUA — April 21\, 2026 (3 releases)\n\n1. Fog Hill of Five Elements Vol. 5  [Manhua Volume] — Seven Seas\n2. Heaven Official's Blessing (Novel) Vol. 10  [Novel] — Seven Seas\n3. Spirit Farmers Vol. 3  [Manhua Volume] — Yen Press\n\n─────────────────\notakusync.net
+CATEGORIES:Manhua\,Spring 2026
+COLOR:sage
+X-APPLE-CALENDAR-COLOR:#10B981
+END:VEVENT
+END:VCALENDAR
