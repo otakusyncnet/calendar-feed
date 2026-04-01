@@ -1,61 +1,144 @@
-const ADMIN_PASSWORD = "3ZgQgmQrqYWn";
+const GITHUB_PAGES = "https://otakusyncnet.github.io/calendar-feed";
 
-// ── CORS HEADERS ──────────────────────────────────────────────────
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": "Content-Type, X-Admin-Password",
 };
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { ...CORS, "Content-Type": "application/json" },
+    headers: {
+      ...CORS,
+      "Content-Type": "application/json; charset=UTF-8",
+    },
   });
 }
 
 function html(body, status = 200) {
   return new Response(body, {
     status,
-    headers: { "Content-Type": "text/html;charset=UTF-8" },
+    headers: {
+      "Content-Type": "text/html; charset=UTF-8",
+    },
   });
 }
 
-// ── MAIN HANDLER ─────────────────────────────────────────────────
+function normalizeEmail(email) {
+  return String(email || "").trim().toLowerCase();
+}
+
+function emailKey(email) {
+  return "email:" + normalizeEmail(email).replace(/[^a-zA-Z0-9]/g, "_");
+}
+
+function tokenKey(token) {
+  return "token:" + token;
+}
+
+function subKey(token) {
+  return "sub:" + token;
+}
+
+function makeToken() {
+  return crypto.randomUUID().replace(/-/g, "").slice(0, 16);
+}
+
+function getFeedMap(hostname) {
+  return {
+    master: `https://${hostname}/feeds/master.ics`,
+    crunchyroll: `https://${hostname}/feeds/crunchyroll.ics`,
+    netflix: `https://${hostname}/feeds/netflix.ics`,
+    hidive: `https://${hostname}/feeds/hidive.ics`,
+    manga: `https://${hostname}/feeds/manga.ics`,
+    manhwa: `https://${hostname}/feeds/manhwa.ics`,
+    manhua: `https://${hostname}/feeds/manhua.ics`,
+  };
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const path = url.pathname;
 
-    if (request.method === "OPTIONS") {
-      return new Response(null, { headers: CORS });
-    }
+    try {
+      if (request.method === "OPTIONS") {
+        return new Response(null, { headers: CORS });
+      }
 
-    // ── PUBLIC: Email signup ─────────────────────────────────────
-    if (path === "/signup" && request.method === "POST") {
-      return handleSignup(request, env);
-    }
+      // Admin UI
+      if (path === "/admin" || path === "/admin/") {
+        return html(ADMIN_HTML);
+      }
 
-    // ── PUBLIC: Feed delivery (tokenized) ────────────────────────
-    if (path.startsWith("/feed/") && path.endsWith(".ics")) {
-      return handleFeed(request, env, url);
-    }
+      // Admin API
+      if (path.startsWith("/admin/api/")) {
+        return handleAdminAPI(request, env, path);
+      }
 
-    // ── ADMIN ROUTES ─────────────────────────────────────────────
-    if (path === "/admin" || path === "/admin/") {
-      return html(ADMIN_HTML);
-    }
+      // Public signup API
+      if (path === "/api/signup" && request.method === "POST") {
+        return handleSignup(request, env, url);
+      }
 
-    if (path.startsWith("/admin/api/")) {
-      return handleAdminAPI(request, env, url, path);
-    }
+      // Tokenized or named feeds
+      if (path.startsWith("/feed/") && path.endsWith(".ics")) {
+        return handleFeed(request, env, url);
+      }
 
-    return new Response("Not found", { status: 404 });
+      // Everything else goes to GitHub Pages
+      return proxyToGitHubPages(path);
+    } catch (err) {
+      return new Response("Server error: " + err.message, { status: 500 });
+    }
   },
 };
 
-// ── SIGNUP HANDLER ────────────────────────────────────────────────
-async function handleSignup(request, env) {
+async function proxyToGitHubPages(path) {
+  let ghPath = path;
+
+  if (path === "/" || path === "") ghPath = "/index.html";
+  else if (path === "/signup") ghPath = "/subscribe.html";
+  else if (path === "/thankyou") ghPath = "/thankyou.html";
+
+  const ghResp = await fetch(GITHUB_PAGES + ghPath, {
+    headers: { "User-Agent": "OtakuSync-Worker" },
+  });
+
+  if (!ghResp.ok) {
+    return new Response("Not found", { status: 404 });
+  }
+
+  const contentType =
+    ghResp.headers.get("content-type") || guessContentType(ghPath);
+
+  return new Response(await ghResp.arrayBuffer(), {
+    status: ghResp.status,
+    headers: {
+      "Content-Type": contentType,
+      "Cache-Control": "max-age=300",
+    },
+  });
+}
+
+function guessContentType(path) {
+  if (path.endsWith(".html")) return "text/html; charset=UTF-8";
+  if (path.endsWith(".css")) return "text/css; charset=UTF-8";
+  if (path.endsWith(".js")) return "application/javascript; charset=UTF-8";
+  if (path.endsWith(".json")) return "application/json; charset=UTF-8";
+  if (path.endsWith(".ics")) return "text/calendar; charset=UTF-8";
+  if (path.endsWith(".png")) return "image/png";
+  if (path.endsWith(".jpg") || path.endsWith(".jpeg")) return "image/jpeg";
+  if (path.endsWith(".svg")) return "image/svg+xml";
+  return "text/plain; charset=UTF-8";
+}
+
+async function handleSignup(request, env, url) {
+  if (!env.ANIME_CAL) {
+    return json({ error: "KV binding ANIME_CAL is missing." }, 503);
+  }
+
   let body;
   try {
     body = await request.json();
@@ -63,75 +146,110 @@ async function handleSignup(request, env) {
     return json({ error: "Invalid JSON" }, 400);
   }
 
-  const email = (body.email || "").trim().toLowerCase();
-  const feeds = body.feeds || ["master"];
+  const email = normalizeEmail(body.email);
+  const feeds = Array.isArray(body.feeds) && body.feeds.length ? body.feeds : ["master"];
 
   if (!email || !email.includes("@")) {
     return json({ error: "Valid email required" }, 400);
   }
 
-  const now = new Date().toISOString();
-  const token = crypto.randomUUID().replace(/-/g, "").substring(0, 16);
+  const existingRaw = await env.ANIME_CAL.get(emailKey(email));
+  if (existingRaw) {
+    const existing = JSON.parse(existingRaw);
+    return json({
+      success: true,
+      existing: true,
+      token: existing.token,
+      feeds: existing.feeds || ["master"],
+      feedUrl: `https://${url.hostname}/feed/${existing.token}_master.ics`,
+    });
+  }
 
-  // Store email record
-  const emailRecord = {
+  const token = makeToken();
+  const now = new Date().toISOString();
+
+  const record = {
     email,
     feeds,
     token,
     created: now,
     source: "subscribe_page",
+    syncCount: 0,
+    lastSync: null,
+    status: "active",
   };
 
-  // Key by email so we don't duplicate
-  const emailKey = "email:" + email.replace(/[^a-zA-Z0-9]/g, "_");
-  await env.ANIME_CAL.put(emailKey, JSON.stringify(emailRecord));
+  const subscriberRecord = {
+    token,
+    email,
+    note: "Self-signup",
+    created: now,
+    status: "active",
+    lastSync: null,
+    syncCount: 0,
+  };
 
-  // Also store token -> email mapping for feed delivery
-  await env.ANIME_CAL.put("token:" + token, email);
+  await env.ANIME_CAL.put(emailKey(email), JSON.stringify(record));
+  await env.ANIME_CAL.put(tokenKey(token), email);
+  await env.ANIME_CAL.put(subKey(token), JSON.stringify(subscriberRecord));
 
-  return json({ success: true, token, feeds });
+  return json({
+    success: true,
+    existing: false,
+    token,
+    feeds,
+    feedUrl: `https://${url.hostname}/feed/${token}_master.ics`,
+  });
 }
 
-// ── FEED HANDLER ─────────────────────────────────────────────────
 async function handleFeed(request, env, url) {
-  const pathParts = url.pathname.split("/");
-  const filename = pathParts[pathParts.length - 1];
-  const feedName = filename.replace(".ics", "");
+  if (!env.ANIME_CAL) {
+    return new Response("KV binding ANIME_CAL is missing.", { status: 503 });
+  }
 
-  // Valid feeds
-  const FEED_URLS = {
-    master:      "https://otakusync.net/feeds/master.ics",
-    crunchyroll: "https://otakusync.net/feeds/crunchyroll.ics",
-    netflix:     "https://otakusync.net/feeds/netflix.ics",
-    hidive:      "https://otakusync.net/feeds/hidive.ics",
-    manga:       "https://otakusync.net/feeds/manga.ics",
-    manhwa:      "https://otakusync.net/feeds/manhwa.ics",
-    manhua:      "https://otakusync.net/feeds/manhua.ics",
-  };
+  const filename = url.pathname.split("/").pop();
+  const name = filename.replace(/\.ics$/i, "");
+  const feedMap = getFeedMap(url.hostname);
 
-  // Check if this is a tokenized feed: /feed/TOKEN_FEEDNAME.ics
-  // or a direct named feed: /feed/master.ics
-  let targetUrl = FEED_URLS[feedName];
+  let targetUrl = feedMap[name];
+  let token = null;
 
+  // tokenized format: /feed/TOKEN_master.ics
   if (!targetUrl) {
-    // Try token format: TOKEN_feedname
-    const parts = feedName.split("_");
+    const parts = name.split("_");
     if (parts.length >= 2) {
-      const token = parts[0];
-      const feed = parts.slice(1).join("_");
-      // Validate token exists
-      const emailForToken = await env.ANIME_CAL.get("token:" + token);
-      if (emailForToken) {
-        // Log sync
-        const emailKey = "email:" + emailForToken.replace(/[^a-zA-Z0-9]/g, "_");
-        const record = await env.ANIME_CAL.get(emailKey);
-        if (record) {
-          const parsed = JSON.parse(record);
-          parsed.lastSync = new Date().toISOString();
-          parsed.syncCount = (parsed.syncCount || 0) + 1;
-          await env.ANIME_CAL.put(emailKey, JSON.stringify(parsed));
-        }
-        targetUrl = FEED_URLS[feed] || FEED_URLS.master;
+      token = parts[0];
+      const requestedFeed = parts.slice(1).join("_");
+
+      const mappedEmail = await env.ANIME_CAL.get(tokenKey(token));
+      if (!mappedEmail) {
+        return new Response("Invalid or expired subscription link.", { status: 403 });
+      }
+
+      const emailRecordRaw = await env.ANIME_CAL.get(emailKey(mappedEmail));
+      if (!emailRecordRaw) {
+        return new Response("Subscription record not found.", { status: 403 });
+      }
+
+      const emailRecord = JSON.parse(emailRecordRaw);
+      if (emailRecord.status && emailRecord.status !== "active") {
+        return new Response("This subscription has been deactivated.", { status: 403 });
+      }
+
+      targetUrl = feedMap[requestedFeed] || feedMap.master;
+
+      // update email-based stats
+      emailRecord.lastSync = new Date().toISOString();
+      emailRecord.syncCount = (emailRecord.syncCount || 0) + 1;
+      await env.ANIME_CAL.put(emailKey(mappedEmail), JSON.stringify(emailRecord));
+
+      // update sub-based stats
+      const subRaw = await env.ANIME_CAL.get(subKey(token));
+      if (subRaw) {
+        const sub = JSON.parse(subRaw);
+        sub.lastSync = emailRecord.lastSync;
+        sub.syncCount = (sub.syncCount || 0) + 1;
+        await env.ANIME_CAL.put(subKey(token), JSON.stringify(sub));
       }
     }
   }
@@ -140,27 +258,63 @@ async function handleFeed(request, env, url) {
     return new Response("Feed not found", { status: 404 });
   }
 
-  // Proxy the ICS file
-  const icsResponse = await fetch(targetUrl);
-  const icsText = await icsResponse.text();
+  const feedResp = await fetch(targetUrl, {
+    headers: { "User-Agent": "OtakuSync-Worker" },
+  });
 
-  return new Response(icsText, {
+  if (!feedResp.ok) {
+    return new Response("Calendar temporarily unavailable.", { status: 503 });
+  }
+
+  return new Response(await feedResp.text(), {
+    status: 200,
     headers: {
-      "Content-Type": "text/calendar;charset=UTF-8",
+      "Content-Type": "text/calendar; charset=UTF-8",
       "Cache-Control": "max-age=3600",
     },
   });
 }
 
-// ── ADMIN API ─────────────────────────────────────────────────────
-async function handleAdminAPI(request, env, url, path) {
-  // Auth check
-  const pw = url.searchParams.get("pw");
-  if (pw !== ADMIN_PASSWORD) {
+async function handleAdminAPI(request, env, path) {
+  if (!env.ANIME_CAL) {
+    return json({ error: "KV binding ANIME_CAL is missing." }, 503);
+  }
+
+  if (!env.ADMIN_PASSWORD) {
+    return json({ error: "ADMIN_PASSWORD secret is missing." }, 503);
+  }
+
+  const pw = request.headers.get("X-Admin-Password");
+  if (pw !== env.ADMIN_PASSWORD) {
     return json({ error: "Unauthorized" }, 401);
   }
 
-  // GET /admin/api/subscribers — original subscriber list
+  // Stats
+  if (path === "/admin/api/stats" && request.method === "GET") {
+    const [subsList, emailsList] = await Promise.all([
+      env.ANIME_CAL.list({ prefix: "sub:" }),
+      env.ANIME_CAL.list({ prefix: "email:" }),
+    ]);
+
+    const subs = await Promise.all(
+      subsList.keys.map(async (k) => {
+        const val = await env.ANIME_CAL.get(k.name);
+        return val ? JSON.parse(val) : null;
+      })
+    );
+
+    const filteredSubs = subs.filter(Boolean);
+
+    return json({
+      totalSubscribers: filteredSubs.length,
+      activeSubscribers: filteredSubs.filter((s) => s.status === "active").length,
+      inactiveSubscribers: filteredSubs.filter((s) => s.status !== "active").length,
+      totalSyncs: filteredSubs.reduce((sum, s) => sum + (s.syncCount || 0), 0),
+      totalEmails: emailsList.keys.length,
+    });
+  }
+
+  // List subscribers
   if (path === "/admin/api/subscribers" && request.method === "GET") {
     const list = await env.ANIME_CAL.list({ prefix: "sub:" });
     const subs = await Promise.all(
@@ -169,50 +323,132 @@ async function handleAdminAPI(request, env, url, path) {
         return val ? JSON.parse(val) : null;
       })
     );
-    return json({ subscribers: subs.filter(Boolean) });
+
+    return json({
+      subscribers: subs.filter(Boolean).sort((a, b) => {
+        return String(b.created || "").localeCompare(String(a.created || ""));
+      }),
+    });
   }
 
-  // POST /admin/api/subscribers — create subscriber
+  // Create subscriber
   if (path === "/admin/api/subscribers" && request.method === "POST") {
     let body;
-    try { body = await request.json(); } catch { return json({ error: "Bad JSON" }, 400); }
-    const token = crypto.randomUUID().replace(/-/g, "").substring(0, 16);
+    try {
+      body = await request.json();
+    } catch {
+      return json({ error: "Bad JSON" }, 400);
+    }
+
+    const email = normalizeEmail(body.email || "");
+    const note = String(body.note || "").trim();
+    const feeds = Array.isArray(body.feeds) && body.feeds.length ? body.feeds : ["master"];
+
+    const token = makeToken();
+    const now = new Date().toISOString();
+
     const sub = {
       token,
-      email: body.email || "",
-      note: body.note || "",
-      created: new Date().toISOString(),
+      email,
+      note,
+      feeds,
+      created: now,
       status: "active",
       lastSync: null,
       syncCount: 0,
     };
-    await env.ANIME_CAL.put("sub:" + token, JSON.stringify(sub));
-    const feedUrl = `https://otakusync.net/feed/${token}.ics`;
-    return json({ success: true, token, feedUrl, subscriber: sub });
+
+    await env.ANIME_CAL.put(subKey(token), JSON.stringify(sub));
+
+    if (email) {
+      await env.ANIME_CAL.put(
+        emailKey(email),
+        JSON.stringify({
+          email,
+          feeds,
+          token,
+          created: now,
+          source: "admin_create",
+          syncCount: 0,
+          lastSync: null,
+          status: "active",
+        })
+      );
+      await env.ANIME_CAL.put(tokenKey(token), email);
+    }
+
+    return json({
+      success: true,
+      subscriber: sub,
+      feedUrl: `https://${new URL(request.url).hostname}/feed/${token}_master.ics`,
+    });
   }
 
-  // PATCH /admin/api/subscribers/:token — update status
-  const patchMatch = path.match(/^\/admin\/api\/subscribers\/([^/]+)$/);
-  if (patchMatch && request.method === "PATCH") {
-    const token = patchMatch[1];
-    const existing = await env.ANIME_CAL.get("sub:" + token);
+  // Update subscriber
+  const subMatch = path.match(/^\/admin\/api\/subscribers\/([^/]+)$/);
+
+  if (subMatch && request.method === "PATCH") {
+    const token = subMatch[1];
+    const existing = await env.ANIME_CAL.get(subKey(token));
     if (!existing) return json({ error: "Not found" }, 404);
+
     let body;
-    try { body = await request.json(); } catch { return json({ error: "Bad JSON" }, 400); }
-    const updated = { ...JSON.parse(existing), ...body };
-    await env.ANIME_CAL.put("sub:" + token, JSON.stringify(updated));
+    try {
+      body = await request.json();
+    } catch {
+      return json({ error: "Bad JSON" }, 400);
+    }
+
+    const current = JSON.parse(existing);
+    const updated = {
+      ...current,
+      ...body,
+      token: current.token,
+    };
+
+    await env.ANIME_CAL.put(subKey(token), JSON.stringify(updated));
+
+    if (updated.email) {
+      const existingEmailRaw = await env.ANIME_CAL.get(emailKey(updated.email));
+      const emailRecord = existingEmailRaw ? JSON.parse(existingEmailRaw) : {};
+      await env.ANIME_CAL.put(
+        emailKey(updated.email),
+        JSON.stringify({
+          ...emailRecord,
+          email: updated.email,
+          feeds: updated.feeds || emailRecord.feeds || ["master"],
+          token,
+          created: emailRecord.created || updated.created,
+          source: emailRecord.source || "admin_update",
+          syncCount: typeof updated.syncCount === "number" ? updated.syncCount : (emailRecord.syncCount || 0),
+          lastSync: updated.lastSync ?? emailRecord.lastSync ?? null,
+          status: updated.status || "active",
+        })
+      );
+      await env.ANIME_CAL.put(tokenKey(token), updated.email);
+    }
+
     return json({ success: true, subscriber: updated });
   }
 
-  // DELETE /admin/api/subscribers/:token
-  const deleteMatch = path.match(/^\/admin\/api\/subscribers\/([^/]+)$/);
-  if (deleteMatch && request.method === "DELETE") {
-    const token = deleteMatch[1];
-    await env.ANIME_CAL.delete("sub:" + token);
+  // Delete subscriber
+  if (subMatch && request.method === "DELETE") {
+    const token = subMatch[1];
+    const existing = await env.ANIME_CAL.get(subKey(token));
+
+    if (existing) {
+      const sub = JSON.parse(existing);
+      if (sub.email) {
+        await env.ANIME_CAL.delete(emailKey(sub.email));
+      }
+      await env.ANIME_CAL.delete(tokenKey(token));
+    }
+
+    await env.ANIME_CAL.delete(subKey(token));
     return json({ success: true });
   }
 
-  // GET /admin/api/emails — all email signups
+  // List emails
   if (path === "/admin/api/emails" && request.method === "GET") {
     const list = await env.ANIME_CAL.list({ prefix: "email:" });
     const emails = await Promise.all(
@@ -221,11 +457,15 @@ async function handleAdminAPI(request, env, url, path) {
         return val ? JSON.parse(val) : null;
       })
     );
-    const filtered = emails.filter(Boolean);
+
+    const filtered = emails.filter(Boolean).sort((a, b) => {
+      return String(b.created || "").localeCompare(String(a.created || ""));
+    });
+
     return json({ emails: filtered, count: filtered.length });
   }
 
-  // GET /admin/api/emails/export — CSV download
+  // Export emails CSV
   if (path === "/admin/api/emails/export" && request.method === "GET") {
     const list = await env.ANIME_CAL.list({ prefix: "email:" });
     const emails = await Promise.all(
@@ -234,314 +474,455 @@ async function handleAdminAPI(request, env, url, path) {
         return val ? JSON.parse(val) : null;
       })
     );
+
     const filtered = emails.filter(Boolean);
 
     const rows = [
-      ["Email", "Feeds", "Signed Up", "Last Sync", "Sync Count"],
+      ["Email", "Feeds", "Created", "Last Sync", "Sync Count", "Status", "Token"],
       ...filtered.map((e) => [
-        e.email,
+        e.email || "",
         (e.feeds || []).join("|"),
         e.created || "",
         e.lastSync || "",
         e.syncCount || 0,
+        e.status || "",
+        e.token || "",
       ]),
     ];
 
-    const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const csv = rows
+      .map((row) =>
+        row.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")
+      )
+      .join("\n");
 
     return new Response(csv, {
+      status: 200,
       headers: {
-        "Content-Type": "text/csv",
-        "Content-Disposition": `attachment; filename="otakusync-emails-${new Date().toISOString().slice(0,10)}.csv"`,
         ...CORS,
+        "Content-Type": "text/csv; charset=UTF-8",
+        "Content-Disposition": 'attachment; filename="otakusync-emails.csv"',
       },
-    });
-  }
-
-  // GET /admin/api/stats — dashboard stats
-  if (path === "/admin/api/stats" && request.method === "GET") {
-    const [subList, emailList] = await Promise.all([
-      env.ANIME_CAL.list({ prefix: "sub:" }),
-      env.ANIME_CAL.list({ prefix: "email:" }),
-    ]);
-    const subs = await Promise.all(subList.keys.map(async k => { const v = await env.ANIME_CAL.get(k.name); return v ? JSON.parse(v) : null; }));
-    const filtered = subs.filter(Boolean);
-    return json({
-      totalSubscribers: filtered.length,
-      activeSubscribers: filtered.filter(s => s.status === "active").length,
-      totalSyncs: filtered.reduce((a, s) => a + (s.syncCount || 0), 0),
-      totalEmails: emailList.keys.length,
     });
   }
 
   return json({ error: "Not found" }, 404);
 }
 
-// ── ADMIN HTML ────────────────────────────────────────────────────
 const ADMIN_HTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
 <title>OtakuSync Admin</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--red:#e84040;--gold:#f5c842;--teal:#00d4aa;--purple:#9b5de5;--dark:#04040f;--dark2:#080820;--dark3:#0d0d2b;--border:rgba(255,255,255,0.08);}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--dark);color:#f0f0f0;min-height:100vh;}
-.header{background:var(--dark2);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;justify-content:space-between;align-items:center;}
-.brand{font-size:20px;font-weight:700;color:#fff;letter-spacing:.05em;}
-.brand span{color:var(--teal);}
-#login-section{max-width:400px;margin:80px auto;background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:32px;}
-#login-section h2{font-size:24px;font-weight:700;color:#fff;margin-bottom:20px;}
-input[type=password],input[type=text],input[type=email]{width:100%;padding:10px 14px;background:#04040f;border:1px solid var(--border);border-radius:6px;color:#f0f0f0;font-size:14px;margin-bottom:12px;}
-input:focus{outline:none;border-color:var(--teal);}
-.btn{padding:10px 20px;border-radius:6px;border:none;cursor:pointer;font-size:14px;font-weight:600;transition:opacity .15s;}
-.btn:hover{opacity:.85;}
-.btn-primary{background:var(--red);color:#fff;}
-.btn-teal{background:var(--teal);color:#04040f;}
-.btn-sm{padding:6px 14px;font-size:13px;}
-.btn-outline{background:transparent;color:rgba(240,240,240,.6);border:1px solid var(--border);}
-.btn-outline:hover{border-color:rgba(255,255,255,.3);color:#fff;}
-#main{display:none;padding:24px;}
-.tabs{display:flex;gap:4px;margin-bottom:24px;border-bottom:1px solid var(--border);padding-bottom:0;}
-.tab{padding:10px 20px;background:transparent;border:none;color:rgba(240,240,240,.5);cursor:pointer;font-size:14px;font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;}
-.tab.active{color:var(--teal);border-bottom-color:var(--teal);}
-.tab-content{display:none;}
-.tab-content.active{display:block;}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px;}
-.stat{background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:20px;text-align:center;}
-.stat-num{font-size:40px;font-weight:700;color:var(--gold);line-height:1;}
-.stat-label{font-size:12px;color:rgba(240,240,240,.5);margin-top:4px;letter-spacing:.05em;}
-.card{background:var(--dark2);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px;}
-.card h2{font-size:16px;font-weight:700;color:#fff;margin-bottom:16px;}
-.form-row{display:flex;gap:8px;flex-wrap:wrap;}
-.form-row input{flex:1;min-width:180px;margin-bottom:0;}
-table{width:100%;border-collapse:collapse;font-size:13px;}
-th{text-align:left;padding:8px 12px;color:rgba(240,240,240,.4);font-weight:600;letter-spacing:.05em;font-size:11px;border-bottom:1px solid var(--border);}
-td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top;}
-tr:hover td{background:rgba(255,255,255,.02);}
-.badge{display:inline-block;padding:3px 8px;border-radius:3px;font-size:11px;font-weight:600;}
-.badge-active{background:rgba(0,212,170,.15);color:var(--teal);}
-.badge-paused{background:rgba(232,64,64,.15);color:var(--red);}
-.url-text{font-family:monospace;font-size:11px;color:var(--teal);word-break:break-all;}
-.actions{display:flex;gap:6px;flex-wrap:wrap;}
-#new-result{margin-top:12px;display:none;background:#04040f;border:1px solid rgba(0,212,170,.3);border-radius:8px;padding:14px;}
-#new-result p{font-size:12px;color:rgba(240,240,240,.5);margin-bottom:6px;}
-#error-box{background:rgba(232,64,64,.1);border:1px solid rgba(232,64,64,.3);border-radius:6px;padding:10px;color:var(--red);font-size:13px;display:none;margin-top:8px;}
-#toast{position:fixed;bottom:20px;right:20px;background:var(--teal);color:#04040f;font-weight:700;padding:12px 20px;border-radius:8px;font-size:14px;display:none;z-index:999;}
-.empty{text-align:center;padding:40px;color:rgba(240,240,240,.3);font-size:14px;}
-.export-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.email-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(155,93,229,.12);border:1px solid rgba(155,93,229,.3);border-radius:4px;padding:2px 8px;font-size:11px;color:#c4a0f0;}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #0d0d1a;
+    color: #e5e7eb;
+    min-height: 100vh;
+  }
+  .wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  .header {
+    margin-bottom: 20px;
+  }
+  .header h1 {
+    font-size: 28px;
+    color: white;
+  }
+  .header p {
+    color: #9ca3af;
+    margin-top: 6px;
+  }
+  .card {
+    background: #17172a;
+    border: 1px solid #2a2a44;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 18px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .stat {
+    background: #111122;
+    border: 1px solid #2a2a44;
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+  }
+  .stat .num {
+    font-size: 32px;
+    font-weight: 800;
+    color: #34d399;
+  }
+  .stat .label {
+    margin-top: 6px;
+    color: #9ca3af;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+  input, button, select {
+    font: inherit;
+  }
+  input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #374151;
+    background: #0b1020;
+    color: white;
+  }
+  input:focus {
+    outline: none;
+    border-color: #34d399;
+  }
+  .row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .row > * {
+    flex: 1;
+    min-width: 180px;
+  }
+  button {
+    padding: 12px 16px;
+    border: 0;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .btn-primary { background: #34d399; color: #08110f; }
+  .btn-danger { background: #ef4444; color: white; }
+  .btn-muted { background: #374151; color: white; }
+  .btn-warn { background: #f59e0b; color: black; }
+  .small-btn {
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+  }
+  .hidden { display: none; }
+  .error {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(239,68,68,.1);
+    border: 1px solid rgba(239,68,68,.4);
+    color: #fca5a5;
+  }
+  .success {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(52,211,153,.1);
+    border: 1px solid rgba(52,211,153,.4);
+    color: #86efac;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #2a2a44;
+    vertical-align: top;
+  }
+  th {
+    color: #9ca3af;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+  .table-wrap {
+    overflow-x: auto;
+  }
+  .badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .active { background: rgba(52,211,153,.12); color: #86efac; }
+  .inactive { background: rgba(239,68,68,.12); color: #fca5a5; }
+  .mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    word-break: break-all;
+    color: #93c5fd;
+  }
 </style>
 </head>
 <body>
-<div class="header">
-  <div class="brand">OTAKU<span>SYNC</span> Admin</div>
-  <div id="header-status" style="font-size:13px;color:rgba(240,240,240,.4);"></div>
-</div>
-
-<div id="login-section">
-  <h2>Admin Login</h2>
-  <input type="password" id="pw-input" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')login()"/>
-  <button class="btn btn-primary" style="width:100%" onclick="login()">Login</button>
-  <div id="error-box"></div>
-</div>
-
-<div id="main">
-  <div class="tabs">
-    <button class="tab active" onclick="showTab('dashboard',this)">Dashboard</button>
-    <button class="tab" onclick="showTab('subscribers',this)">Feed Subscribers</button>
-    <button class="tab" onclick="showTab('emails',this)">Email List</button>
+<div class="wrap">
+  <div class="header">
+    <h1>OtakuSync Admin</h1>
+    <p>Subscription manager</p>
   </div>
 
-  <!-- DASHBOARD -->
-  <div class="tab-content active" id="tab-dashboard">
-    <div class="stats">
-      <div class="stat"><div class="stat-num" id="stat-total">—</div><div class="stat-label">Feed Subscribers</div></div>
-      <div class="stat"><div class="stat-num" id="stat-active">—</div><div class="stat-label">Active</div></div>
-      <div class="stat"><div class="stat-num" id="stat-syncs">—</div><div class="stat-label">Total Syncs</div></div>
-      <div class="stat"><div class="stat-num" id="stat-emails">—</div><div class="stat-label">Email Signups</div></div>
+  <div class="card" id="loginCard">
+    <div class="row">
+      <input type="password" id="pw" placeholder="Admin password" autocomplete="current-password" />
+      <button class="btn-primary" onclick="login()">Login</button>
     </div>
-    <div class="card">
-      <h2>Quick Links</h2>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <a href="https://otakusync.net" target="_blank" class="btn btn-outline btn-sm">🌐 Live Site</a>
-        <a href="https://otakusync.net/subscribe" target="_blank" class="btn btn-outline btn-sm">📋 Subscribe Page</a>
-        <a href="https://otakusync.net/feeds/master.ics" target="_blank" class="btn btn-outline btn-sm">📅 Master Feed</a>
-        <a href="https://github.com/otakusyncnet/calendar-feed" target="_blank" class="btn btn-outline btn-sm">🐙 GitHub Repo</a>
-      </div>
-    </div>
+    <div id="loginError" class="error hidden"></div>
   </div>
 
-  <!-- FEED SUBSCRIBERS -->
-  <div class="tab-content" id="tab-subscribers">
-    <div class="card">
-      <h2>Add New Subscriber</h2>
-      <div class="form-row">
-        <input type="email" id="new-email" placeholder="Email address"/>
-        <input type="text" id="new-note" placeholder="Note (e.g. Gumroad order #123)"/>
-        <button class="btn btn-teal" onclick="createSub()">Generate Link</button>
-      </div>
-      <div id="new-result">
-        <p>Send this URL to your subscriber:</p>
-        <div class="url-text" id="new-url"></div>
-        <div style="margin-top:10px;display:flex;gap:8px;">
-          <button class="btn btn-sm btn-primary" onclick="copyNewUrl()">Copy Link</button>
-        </div>
-      </div>
+  <div id="app" class="hidden">
+    <div class="grid">
+      <div class="stat"><div class="num" id="sTotal">0</div><div class="label">Total Subs</div></div>
+      <div class="stat"><div class="num" id="sActive">0</div><div class="label">Active</div></div>
+      <div class="stat"><div class="num" id="sInactive">0</div><div class="label">Inactive</div></div>
+      <div class="stat"><div class="num" id="sSyncs">0</div><div class="label">Total Syncs</div></div>
+      <div class="stat"><div class="num" id="sEmails">0</div><div class="label">Email Records</div></div>
     </div>
-    <div class="card">
-      <h2>All Feed Subscribers</h2>
-      <table>
-        <thead><tr><th>Email/Note</th><th>Created</th><th>Last Sync</th><th>Syncs</th><th>Status</th><th>Feed URL</th><th>Actions</th></tr></thead>
-        <tbody id="sub-table"><tr><td colspan="7" class="empty">Loading...</td></tr></tbody>
-      </table>
-    </div>
-  </div>
 
-  <!-- EMAIL LIST -->
-  <div class="tab-content" id="tab-emails">
     <div class="card">
-      <div class="export-bar">
-        <h2 style="margin-bottom:0">Email Signups <span id="email-count" style="font-size:13px;color:rgba(240,240,240,.4);font-weight:400;"></span></h2>
-        <button class="btn btn-teal btn-sm" onclick="exportCSV()">⬇️ Export CSV for Mailchimp</button>
+      <h2 style="margin-bottom:12px;">Create Subscriber</h2>
+      <div class="row">
+        <input type="email" id="newEmail" placeholder="Email" />
+        <input type="text" id="newNote" placeholder="Note" />
+        <button class="btn-primary" onclick="createSubscriber()">Generate Link</button>
       </div>
-      <p style="font-size:13px;color:rgba(240,240,240,.4);margin-bottom:16px;">These are visitors who entered their email on the subscribe page. Export CSV → import to Mailchimp anytime.</p>
-      <table>
-        <thead><tr><th>Email</th><th>Feeds Selected</th><th>Signed Up</th><th>Last Sync</th><th>Syncs</th></tr></thead>
-        <tbody id="email-table"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody>
-      </table>
+      <div id="createResult" class="success hidden"></div>
+    </div>
+
+    <div class="card">
+      <div class="row" style="align-items:center;">
+        <div style="font-weight:700;">Subscribers</div>
+        <button class="btn-muted" onclick="refreshAll()">Refresh</button>
+        <button class="btn-muted" onclick="exportEmails()">Export Emails CSV</button>
+      </div>
+
+      <div class="table-wrap" style="margin-top:14px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Note</th>
+              <th>Created</th>
+              <th>Last Sync</th>
+              <th>Syncs</th>
+              <th>Status</th>
+              <th>Master Feed</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="subTable">
+            <tr><td colspan="8">No data yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
-
-<div id="toast"></div>
 
 <script>
-var PW = "", SUBS = [], EMAILS = [];
+let PW = "";
 
-function showError(msg){var e=document.getElementById('error-box');e.textContent=msg;e.style.display='block';}
-function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2200);}
-
-function login(){
-  PW = document.getElementById('pw-input').value;
-  if(!PW){showError('Enter password');return;}
-  document.getElementById('error-box').style.display='none';
-  loadDashboard();
+function setLoginError(msg) {
+  const el = document.getElementById("loginError");
+  el.textContent = msg;
+  el.classList.remove("hidden");
 }
 
-async function api(path, method='GET', body=null){
-  var sep = path.includes('?') ? '&' : '?';
-  var opts = {method, headers:{'Content-Type':'application/json'}};
-  if(body) opts.body = JSON.stringify(body);
-  var res = await fetch('/admin/api/' + path + sep + 'pw=' + PW, opts);
-  return res.json();
+function clearLoginError() {
+  document.getElementById("loginError").classList.add("hidden");
 }
 
-async function loadDashboard(){
-  var data = await api('stats');
-  if(data.error){showError('Wrong password');return;}
-  document.getElementById('login-section').style.display='none';
-  document.getElementById('main').style.display='block';
-  document.getElementById('header-status').textContent = 'Logged in';
-  document.getElementById('stat-total').textContent = data.totalSubscribers;
-  document.getElementById('stat-active').textContent = data.activeSubscribers;
-  document.getElementById('stat-syncs').textContent = data.totalSyncs;
-  document.getElementById('stat-emails').textContent = data.totalEmails;
-  loadSubs();
-  loadEmails();
-}
-
-async function loadSubs(){
-  var data = await api('subscribers');
-  SUBS = data.subscribers || [];
-  var tbody = document.getElementById('sub-table');
-  if(!SUBS.length){tbody.innerHTML='<tr><td colspan="7" class="empty">No subscribers yet</td></tr>';return;}
-  tbody.innerHTML = SUBS.map(s => {
-    var url = 'https://otakusync.net/feed/' + s.token + '.ics';
-    var created = s.created ? new Date(s.created).toLocaleDateString() : '—';
-    var lastSync = s.lastSync ? new Date(s.lastSync).toLocaleDateString() : '—';
-    return \`<tr>
-      <td><div style="font-weight:600">\${s.email||'—'}</div><div style="font-size:11px;color:rgba(240,240,240,.4)">\${s.note||''}</div></td>
-      <td>\${created}</td><td>\${lastSync}</td><td>\${s.syncCount||0}</td>
-      <td><span class="badge \${s.status==='active'?'badge-active':'badge-paused'}">\${s.status||'active'}</span></td>
-      <td><div class="url-text">\${url}</div></td>
-      <td><div class="actions">
-        <button class="btn btn-sm btn-outline" onclick="copyUrl('\${url}')">Copy</button>
-        <button class="btn btn-sm btn-outline" onclick="toggleSub('\${s.token}','\${s.status}')">\${s.status==='active'?'Pause':'Resume'}</button>
-        <button class="btn btn-sm" style="background:rgba(232,64,64,.2);color:var(--red);border:1px solid rgba(232,64,64,.3)" onclick="deleteSub('\${s.token}')">Delete</button>
-      </div></td>
-    </tr>\`;
-  }).join('');
-}
-
-async function loadEmails(){
-  var data = await api('emails');
-  EMAILS = data.emails || [];
-  document.getElementById('email-count').textContent = '(' + EMAILS.length + ' total)';
-  var tbody = document.getElementById('email-table');
-  if(!EMAILS.length){tbody.innerHTML='<tr><td colspan="5" class="empty">No email signups yet — they appear here when visitors subscribe on otakusync.net/subscribe</td></tr>';return;}
-  tbody.innerHTML = EMAILS.map(e => {
-    var feeds = (e.feeds||['master']).map(f=>'<span class="email-chip">'+f+'</span>').join(' ');
-    var created = e.created ? new Date(e.created).toLocaleDateString() : '—';
-    var lastSync = e.lastSync ? new Date(e.lastSync).toLocaleDateString() : '—';
-    return \`<tr>
-      <td style="font-weight:600">\${e.email}</td>
-      <td>\${feeds}</td>
-      <td>\${created}</td>
-      <td>\${lastSync}</td>
-      <td>\${e.syncCount||0}</td>
-    </tr>\`;
-  }).join('');
-}
-
-async function createSub(){
-  var email = document.getElementById('new-email').value.trim();
-  var note = document.getElementById('new-note').value.trim();
-  if(!email){showToast('Enter an email first');return;}
-  var data = await api('subscribers','POST',{email,note});
-  if(data.error){showToast('Error: '+data.error);return;}
-  document.getElementById('new-url').textContent = data.feedUrl;
-  document.getElementById('new-result').style.display='block';
-  loadSubs();
-  loadDashboard();
-}
-
-function copyNewUrl(){
-  copyUrl(document.getElementById('new-url').textContent);
-}
-
-async function toggleSub(token,status){
-  var newStatus = status==='active'?'paused':'active';
-  await api('subscribers/'+token,'PATCH',{status:newStatus});
-  loadSubs();
-}
-
-async function deleteSub(token){
-  if(!confirm('Delete this subscriber?')) return;
-  await api('subscribers/'+token,'DELETE');
-  loadSubs();
-}
-
-function copyUrl(url){
-  navigator.clipboard.writeText(url).catch(()=>{
-    var t=document.createElement('textarea');t.value=url;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);
+async function api(path, options = {}) {
+  const res = await fetch(path, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      "X-Admin-Password": PW,
+      ...(options.headers || {})
+    }
   });
-  showToast('Copied!');
+
+  const contentType = res.headers.get("content-type") || "";
+  const data = contentType.includes("application/json") ? await res.json() : await res.text();
+
+  if (!res.ok) {
+    throw new Error((data && data.error) || "Request failed");
+  }
+
+  return data;
 }
 
-function exportCSV(){
-  window.open('/admin/api/emails/export?pw='+PW,'_blank');
+async function login() {
+  PW = document.getElementById("pw").value.trim();
+  clearLoginError();
+
+  if (!PW) {
+    setLoginError("Enter your admin password.");
+    return;
+  }
+
+  try {
+    await refreshAll();
+    document.getElementById("loginCard").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+  } catch (err) {
+    setLoginError(err.message || "Login failed.");
+  }
 }
 
-function showTab(id, btn){
-  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active');
-  btn.classList.add('active');
+async function refreshAll() {
+  const [stats, subs] = await Promise.all([
+    api("/admin/api/stats"),
+    api("/admin/api/subscribers")
+  ]);
+
+  document.getElementById("sTotal").textContent = stats.totalSubscribers || 0;
+  document.getElementById("sActive").textContent = stats.activeSubscribers || 0;
+  document.getElementById("sInactive").textContent = stats.inactiveSubscribers || 0;
+  document.getElementById("sSyncs").textContent = stats.totalSyncs || 0;
+  document.getElementById("sEmails").textContent = stats.totalEmails || 0;
+
+  renderSubscribers(subs.subscribers || []);
 }
 
-document.getElementById('pw-input').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
+function renderSubscribers(subscribers) {
+  const tbody = document.getElementById("subTable");
+
+  if (!subscribers.length) {
+    tbody.innerHTML = '<tr><td colspan="8">No subscribers found.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = subscribers.map(sub => {
+    const status = sub.status === "active" ? "active" : "inactive";
+    const masterUrl = location.origin + "/feed/" + sub.token + "_master.ics";
+
+    return \`
+      <tr>
+        <td>\${escapeHtml(sub.email || "")}</td>
+        <td>\${escapeHtml(sub.note || "")}</td>
+        <td>\${escapeHtml(sub.created || "")}</td>
+        <td>\${escapeHtml(sub.lastSync || "")}</td>
+        <td>\${sub.syncCount || 0}</td>
+        <td><span class="badge \${status}">\${escapeHtml(sub.status || "inactive")}</span></td>
+        <td class="mono">\${escapeHtml(masterUrl)}</td>
+        <td>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="small-btn btn-muted" onclick="copyText('\${masterUrl}')">Copy</button>
+            \${sub.status === "active"
+              ? '<button class="small-btn btn-warn" onclick="setStatus(\\'' + sub.token + '\\', \\'inactive\\')">Pause</button>'
+              : '<button class="small-btn btn-primary" onclick="setStatus(\\'' + sub.token + '\\', \\'active\\')">Activate</button>'}
+            <button class="small-btn btn-danger" onclick="deleteSubscriber('\${sub.token}')">Delete</button>
+          </div>
+        </td>
+      </tr>
+    \`;
+  }).join("");
+}
+
+async function createSubscriber() {
+  const email = document.getElementById("newEmail").value.trim();
+  const note = document.getElementById("newNote").value.trim();
+  const result = document.getElementById("createResult");
+
+  result.classList.add("hidden");
+  result.textContent = "";
+
+  try {
+    const data = await api("/admin/api/subscribers", {
+      method: "POST",
+      body: JSON.stringify({ email, note, feeds: ["master"] })
+    });
+
+    const feedUrl = location.origin + "/feed/" + data.subscriber.token + "_master.ics";
+    result.textContent = "Created. Master feed: " + feedUrl;
+    result.classList.remove("hidden");
+
+    document.getElementById("newEmail").value = "";
+    document.getElementById("newNote").value = "";
+
+    await refreshAll();
+  } catch (err) {
+    result.textContent = err.message || "Could not create subscriber.";
+    result.className = "error";
+    result.classList.remove("hidden");
+  }
+}
+
+async function setStatus(token, status) {
+  try {
+    await api("/admin/api/subscribers/" + encodeURIComponent(token), {
+      method: "PATCH",
+      body: JSON.stringify({ status })
+    });
+    await refreshAll();
+  } catch (err) {
+    alert(err.message || "Update failed.");
+  }
+}
+
+async function deleteSubscriber(token) {
+  if (!confirm("Delete this subscriber?")) return;
+
+  try {
+    await api("/admin/api/subscribers/" + encodeURIComponent(token), {
+      method: "DELETE"
+    });
+    await refreshAll();
+  } catch (err) {
+    alert(err.message || "Delete failed.");
+  }
+}
+
+async function exportEmails() {
+  const res = await fetch("/admin/api/emails/export", {
+    headers: { "X-Admin-Password": PW }
+  });
+
+  if (!res.ok) {
+    alert("Export failed.");
+    return;
+  }
+
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "otakusync-emails.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    alert("Copied");
+  } catch {
+    alert("Copy failed");
+  }
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+document.getElementById("pw").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") login();
+});
 </script>
 </body>
 </html>`;
