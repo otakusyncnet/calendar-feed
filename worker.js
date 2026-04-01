@@ -1,8 +1,8 @@
-const GITHUB_PAGES = "https://otakusyncnet.github.io/calendar-feed";
+const RAW_BASE = "https://raw.githubusercontent.com/otakusyncnet/calendar-feed/main";
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, X-Admin-Password",
 };
 
@@ -45,16 +45,26 @@ function makeToken() {
   return crypto.randomUUID().replace(/-/g, "").slice(0, 16);
 }
 
-function getFeedMap(hostname) {
-  return {
-    master: `https://${hostname}/feeds/master.ics`,
-    crunchyroll: `https://${hostname}/feeds/crunchyroll.ics`,
-    netflix: `https://${hostname}/feeds/netflix.ics`,
-    hidive: `https://${hostname}/feeds/hidive.ics`,
-    manga: `https://${hostname}/feeds/manga.ics`,
-    manhwa: `https://${hostname}/feeds/manhwa.ics`,
-    manhua: `https://${hostname}/feeds/manhua.ics`,
-  };
+function guessContentType(path) {
+  if (path.endsWith(".html")) return "text/html; charset=UTF-8";
+  if (path.endsWith(".css")) return "text/css; charset=UTF-8";
+  if (path.endsWith(".js")) return "application/javascript; charset=UTF-8";
+  if (path.endsWith(".json")) return "application/json; charset=UTF-8";
+  if (path.endsWith(".ics")) return "text/calendar; charset=UTF-8";
+  if (path.endsWith(".png")) return "image/png";
+  if (path.endsWith(".jpg") || path.endsWith(".jpeg")) return "image/jpeg";
+  if (path.endsWith(".svg")) return "image/svg+xml";
+  return "text/plain; charset=UTF-8";
+}
+
+function rawUrl(path) {
+  return RAW_BASE + path;
+}
+
+async function fetchRaw(path) {
+  return fetch(rawUrl(path), {
+    headers: { "User-Agent": "OtakuSync-Worker" },
+  });
 }
 
 export default {
@@ -67,71 +77,59 @@ export default {
         return new Response(null, { headers: CORS });
       }
 
-      // Admin UI
       if (path === "/admin" || path === "/admin/") {
         return html(ADMIN_HTML);
       }
 
-      // Admin API
       if (path.startsWith("/admin/api/")) {
-        return handleAdminAPI(request, env, path);
+        return handleAdminAPI(request, env, path, url);
       }
 
-      // Public signup API
       if (path === "/api/signup" && request.method === "POST") {
         return handleSignup(request, env, url);
       }
 
-      // Tokenized or named feeds
       if (path.startsWith("/feed/") && path.endsWith(".ics")) {
-        return handleFeed(request, env, url);
+        return handleTokenFeed(request, env, url);
       }
 
-      // Everything else goes to GitHub Pages
-      return proxyToGitHubPages(path);
+      if (path.startsWith("/feeds/") && path.endsWith(".ics")) {
+        return proxyRawFile(path);
+      }
+
+      if (path === "/" || path === "/index.html") {
+        return proxyRawFile("/index.html");
+      }
+
+      if (path === "/subscribe" || path === "/signup" || path === "/subscribe.html") {
+        return proxyRawFile("/subscribe.html");
+      }
+
+      if (path === "/thankyou" || path === "/thankyou.html") {
+        return proxyRawFile("/thankyou.html");
+      }
+
+      return new Response("Not found", { status: 404 });
     } catch (err) {
       return new Response("Server error: " + err.message, { status: 500 });
     }
   },
 };
 
-async function proxyToGitHubPages(path) {
-  let ghPath = path;
+async function proxyRawFile(path) {
+  const resp = await fetchRaw(path);
 
-  if (path === "/" || path === "") ghPath = "/index.html";
-  else if (path === "/signup") ghPath = "/subscribe.html";
-  else if (path === "/thankyou") ghPath = "/thankyou.html";
-
-  const ghResp = await fetch(GITHUB_PAGES + ghPath, {
-    headers: { "User-Agent": "OtakuSync-Worker" },
-  });
-
-  if (!ghResp.ok) {
+  if (!resp.ok) {
     return new Response("Not found", { status: 404 });
   }
 
-  const contentType =
-    ghResp.headers.get("content-type") || guessContentType(ghPath);
-
-  return new Response(await ghResp.arrayBuffer(), {
-    status: ghResp.status,
+  return new Response(await resp.arrayBuffer(), {
+    status: 200,
     headers: {
-      "Content-Type": contentType,
+      "Content-Type": resp.headers.get("content-type") || guessContentType(path),
       "Cache-Control": "max-age=300",
     },
   });
-}
-
-function guessContentType(path) {
-  if (path.endsWith(".html")) return "text/html; charset=UTF-8";
-  if (path.endsWith(".css")) return "text/css; charset=UTF-8";
-  if (path.endsWith(".js")) return "application/javascript; charset=UTF-8";
-  if (path.endsWith(".json")) return "application/json; charset=UTF-8";
-  if (path.endsWith(".ics")) return "text/calendar; charset=UTF-8";
-  if (path.endsWith(".png")) return "image/png";
-  if (path.endsWith(".jpg") || path.endsWith(".jpeg")) return "image/jpeg";
-  if (path.endsWith(".svg")) return "image/svg+xml";
-  return "text/plain; charset=UTF-8";
 }
 
 async function handleSignup(request, env, url) {
@@ -168,7 +166,7 @@ async function handleSignup(request, env, url) {
   const token = makeToken();
   const now = new Date().toISOString();
 
-  const record = {
+  const emailRecord = {
     email,
     feeds,
     token,
@@ -183,13 +181,14 @@ async function handleSignup(request, env, url) {
     token,
     email,
     note: "Self-signup",
+    feeds,
     created: now,
     status: "active",
     lastSync: null,
     syncCount: 0,
   };
 
-  await env.ANIME_CAL.put(emailKey(email), JSON.stringify(record));
+  await env.ANIME_CAL.put(emailKey(email), JSON.stringify(emailRecord));
   await env.ANIME_CAL.put(tokenKey(token), email);
   await env.ANIME_CAL.put(subKey(token), JSON.stringify(subscriberRecord));
 
@@ -202,68 +201,68 @@ async function handleSignup(request, env, url) {
   });
 }
 
-async function handleFeed(request, env, url) {
+async function handleTokenFeed(request, env, url) {
   if (!env.ANIME_CAL) {
     return new Response("KV binding ANIME_CAL is missing.", { status: 503 });
   }
 
   const filename = url.pathname.split("/").pop();
   const name = filename.replace(/\.ics$/i, "");
-  const feedMap = getFeedMap(url.hostname);
+  const parts = name.split("_");
 
-  let targetUrl = feedMap[name];
-  let token = null;
-
-  // tokenized format: /feed/TOKEN_master.ics
-  if (!targetUrl) {
-    const parts = name.split("_");
-    if (parts.length >= 2) {
-      token = parts[0];
-      const requestedFeed = parts.slice(1).join("_");
-
-      const mappedEmail = await env.ANIME_CAL.get(tokenKey(token));
-      if (!mappedEmail) {
-        return new Response("Invalid or expired subscription link.", { status: 403 });
-      }
-
-      const emailRecordRaw = await env.ANIME_CAL.get(emailKey(mappedEmail));
-      if (!emailRecordRaw) {
-        return new Response("Subscription record not found.", { status: 403 });
-      }
-
-      const emailRecord = JSON.parse(emailRecordRaw);
-      if (emailRecord.status && emailRecord.status !== "active") {
-        return new Response("This subscription has been deactivated.", { status: 403 });
-      }
-
-      targetUrl = feedMap[requestedFeed] || feedMap.master;
-
-      // update email-based stats
-      emailRecord.lastSync = new Date().toISOString();
-      emailRecord.syncCount = (emailRecord.syncCount || 0) + 1;
-      await env.ANIME_CAL.put(emailKey(mappedEmail), JSON.stringify(emailRecord));
-
-      // update sub-based stats
-      const subRaw = await env.ANIME_CAL.get(subKey(token));
-      if (subRaw) {
-        const sub = JSON.parse(subRaw);
-        sub.lastSync = emailRecord.lastSync;
-        sub.syncCount = (sub.syncCount || 0) + 1;
-        await env.ANIME_CAL.put(subKey(token), JSON.stringify(sub));
-      }
-    }
+  if (parts.length < 2) {
+    return new Response("Invalid feed link.", { status: 400 });
   }
 
-  if (!targetUrl) {
-    return new Response("Feed not found", { status: 404 });
+  const token = parts[0];
+  const requestedFeed = parts.slice(1).join("_");
+
+  const validFeeds = new Set([
+    "master",
+    "crunchyroll",
+    "netflix",
+    "hidive",
+    "manga",
+    "manhwa",
+    "manhua",
+  ]);
+
+  const feedName = validFeeds.has(requestedFeed) ? requestedFeed : "master";
+
+  const mappedEmail = await env.ANIME_CAL.get(tokenKey(token));
+  if (!mappedEmail) {
+    return new Response("Invalid or expired subscription link.", { status: 403 });
   }
 
-  const feedResp = await fetch(targetUrl, {
-    headers: { "User-Agent": "OtakuSync-Worker" },
-  });
+  const emailRecordRaw = await env.ANIME_CAL.get(emailKey(mappedEmail));
+  if (!emailRecordRaw) {
+    return new Response("Subscription record not found.", { status: 403 });
+  }
+
+  const emailRecord = JSON.parse(emailRecordRaw);
+  if (emailRecord.status && emailRecord.status !== "active") {
+    return new Response("This subscription has been deactivated.", { status: 403 });
+  }
+
+  const feedPath = `/feeds/${feedName}.ics`;
+  const feedResp = await fetchRaw(feedPath);
 
   if (!feedResp.ok) {
     return new Response("Calendar temporarily unavailable.", { status: 503 });
+  }
+
+  const now = new Date().toISOString();
+
+  emailRecord.lastSync = now;
+  emailRecord.syncCount = (emailRecord.syncCount || 0) + 1;
+  await env.ANIME_CAL.put(emailKey(mappedEmail), JSON.stringify(emailRecord));
+
+  const subRaw = await env.ANIME_CAL.get(subKey(token));
+  if (subRaw) {
+    const sub = JSON.parse(subRaw);
+    sub.lastSync = now;
+    sub.syncCount = (sub.syncCount || 0) + 1;
+    await env.ANIME_CAL.put(subKey(token), JSON.stringify(sub));
   }
 
   return new Response(await feedResp.text(), {
@@ -275,7 +274,7 @@ async function handleFeed(request, env, url) {
   });
 }
 
-async function handleAdminAPI(request, env, path) {
+async function handleAdminAPI(request, env, path, url) {
   if (!env.ANIME_CAL) {
     return json({ error: "KV binding ANIME_CAL is missing." }, 503);
   }
@@ -289,7 +288,6 @@ async function handleAdminAPI(request, env, path) {
     return json({ error: "Unauthorized" }, 401);
   }
 
-  // Stats
   if (path === "/admin/api/stats" && request.method === "GET") {
     const [subsList, emailsList] = await Promise.all([
       env.ANIME_CAL.list({ prefix: "sub:" }),
@@ -314,7 +312,6 @@ async function handleAdminAPI(request, env, path) {
     });
   }
 
-  // List subscribers
   if (path === "/admin/api/subscribers" && request.method === "GET") {
     const list = await env.ANIME_CAL.list({ prefix: "sub:" });
     const subs = await Promise.all(
@@ -325,13 +322,12 @@ async function handleAdminAPI(request, env, path) {
     );
 
     return json({
-      subscribers: subs.filter(Boolean).sort((a, b) => {
-        return String(b.created || "").localeCompare(String(a.created || ""));
-      }),
+      subscribers: subs.filter(Boolean).sort((a, b) =>
+        String(b.created || "").localeCompare(String(a.created || ""))
+      ),
     });
   }
 
-  // Create subscriber
   if (path === "/admin/api/subscribers" && request.method === "POST") {
     let body;
     try {
@@ -343,7 +339,6 @@ async function handleAdminAPI(request, env, path) {
     const email = normalizeEmail(body.email || "");
     const note = String(body.note || "").trim();
     const feeds = Array.isArray(body.feeds) && body.feeds.length ? body.feeds : ["master"];
-
     const token = makeToken();
     const now = new Date().toISOString();
 
@@ -380,11 +375,10 @@ async function handleAdminAPI(request, env, path) {
     return json({
       success: true,
       subscriber: sub,
-      feedUrl: `https://${new URL(request.url).hostname}/feed/${token}_master.ics`,
+      feedUrl: `https://${url.hostname}/feed/${token}_master.ics`,
     });
   }
 
-  // Update subscriber
   const subMatch = path.match(/^\/admin\/api\/subscribers\/([^/]+)$/);
 
   if (subMatch && request.method === "PATCH") {
@@ -400,11 +394,7 @@ async function handleAdminAPI(request, env, path) {
     }
 
     const current = JSON.parse(existing);
-    const updated = {
-      ...current,
-      ...body,
-      token: current.token,
-    };
+    const updated = { ...current, ...body, token: current.token };
 
     await env.ANIME_CAL.put(subKey(token), JSON.stringify(updated));
 
@@ -431,7 +421,6 @@ async function handleAdminAPI(request, env, path) {
     return json({ success: true, subscriber: updated });
   }
 
-  // Delete subscriber
   if (subMatch && request.method === "DELETE") {
     const token = subMatch[1];
     const existing = await env.ANIME_CAL.get(subKey(token));
@@ -448,7 +437,6 @@ async function handleAdminAPI(request, env, path) {
     return json({ success: true });
   }
 
-  // List emails
   if (path === "/admin/api/emails" && request.method === "GET") {
     const list = await env.ANIME_CAL.list({ prefix: "email:" });
     const emails = await Promise.all(
@@ -458,14 +446,13 @@ async function handleAdminAPI(request, env, path) {
       })
     );
 
-    const filtered = emails.filter(Boolean).sort((a, b) => {
-      return String(b.created || "").localeCompare(String(a.created || ""));
-    });
+    const filtered = emails.filter(Boolean).sort((a, b) =>
+      String(b.created || "").localeCompare(String(a.created || ""))
+    );
 
     return json({ emails: filtered, count: filtered.length });
   }
 
-  // Export emails CSV
   if (path === "/admin/api/emails/export" && request.method === "GET") {
     const list = await env.ANIME_CAL.list({ prefix: "email:" });
     const emails = await Promise.all(
@@ -491,10 +478,8 @@ async function handleAdminAPI(request, env, path) {
     ];
 
     const csv = rows
-      .map((row) =>
-        row.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")
-      )
-      .join("\n");
+      .map((row) => row.map((v) => '"' + String(v).replace(/"/g, '""') + '"').join(","))
+      .join("\\n");
 
     return new Response(csv, {
       status: 200,
@@ -509,159 +494,45 @@ async function handleAdminAPI(request, env, path) {
   return json({ error: "Not found" }, 404);
 }
 
-const ADMIN_HTML = `<!DOCTYPE html>
+const ADMIN_HTML = \`<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
 <title>OtakuSync Admin</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: #0d0d1a;
-    color: #e5e7eb;
-    min-height: 100vh;
-  }
-  .wrap {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 24px;
-  }
-  .header {
-    margin-bottom: 20px;
-  }
-  .header h1 {
-    font-size: 28px;
-    color: white;
-  }
-  .header p {
-    color: #9ca3af;
-    margin-top: 6px;
-  }
-  .card {
-    background: #17172a;
-    border: 1px solid #2a2a44;
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 18px;
-  }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 12px;
-    margin-bottom: 18px;
-  }
-  .stat {
-    background: #111122;
-    border: 1px solid #2a2a44;
-    border-radius: 14px;
-    padding: 18px;
-    text-align: center;
-  }
-  .stat .num {
-    font-size: 32px;
-    font-weight: 800;
-    color: #34d399;
-  }
-  .stat .label {
-    margin-top: 6px;
-    color: #9ca3af;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-  }
-  input, button, select {
-    font: inherit;
-  }
-  input {
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: 10px;
-    border: 1px solid #374151;
-    background: #0b1020;
-    color: white;
-  }
-  input:focus {
-    outline: none;
-    border-color: #34d399;
-  }
-  .row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  .row > * {
-    flex: 1;
-    min-width: 180px;
-  }
-  button {
-    padding: 12px 16px;
-    border: 0;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 700;
-  }
-  .btn-primary { background: #34d399; color: #08110f; }
-  .btn-danger { background: #ef4444; color: white; }
-  .btn-muted { background: #374151; color: white; }
-  .btn-warn { background: #f59e0b; color: black; }
-  .small-btn {
-    padding: 8px 10px;
-    border-radius: 8px;
-    font-size: 12px;
-  }
-  .hidden { display: none; }
-  .error {
-    margin-top: 12px;
-    padding: 10px 12px;
-    border-radius: 10px;
-    background: rgba(239,68,68,.1);
-    border: 1px solid rgba(239,68,68,.4);
-    color: #fca5a5;
-  }
-  .success {
-    margin-top: 12px;
-    padding: 10px 12px;
-    border-radius: 10px;
-    background: rgba(52,211,153,.1);
-    border: 1px solid rgba(52,211,153,.4);
-    color: #86efac;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
-  th, td {
-    text-align: left;
-    padding: 10px;
-    border-bottom: 1px solid #2a2a44;
-    vertical-align: top;
-  }
-  th {
-    color: #9ca3af;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-  }
-  .table-wrap {
-    overflow-x: auto;
-  }
-  .badge {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 999px;
-    font-size: 11px;
-    font-weight: 700;
-  }
-  .active { background: rgba(52,211,153,.12); color: #86efac; }
-  .inactive { background: rgba(239,68,68,.12); color: #fca5a5; }
-  .mono {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    word-break: break-all;
-    color: #93c5fd;
-  }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0d0d1a;color:#e5e7eb;min-height:100vh}
+.wrap{max-width:1100px;margin:0 auto;padding:24px}
+.header{margin-bottom:20px}
+.header h1{font-size:28px;color:white}
+.header p{color:#9ca3af;margin-top:6px}
+.card{background:#17172a;border:1px solid #2a2a44;border-radius:16px;padding:20px;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:18px}
+.stat{background:#111122;border:1px solid #2a2a44;border-radius:14px;padding:18px;text-align:center}
+.stat .num{font-size:32px;font-weight:800;color:#34d399}
+.stat .label{margin-top:6px;color:#9ca3af;font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+input,button{font:inherit}
+input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #374151;background:#0b1020;color:white}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>*{flex:1;min-width:180px}
+button{padding:12px 16px;border:0;border-radius:10px;cursor:pointer;font-weight:700}
+.btn-primary{background:#34d399;color:#08110f}
+.btn-danger{background:#ef4444;color:white}
+.btn-muted{background:#374151;color:white}
+.btn-warn{background:#f59e0b;color:black}
+.small-btn{padding:8px 10px;border-radius:8px;font-size:12px}
+.hidden{display:none}
+.error{margin-top:12px;padding:10px 12px;border-radius:10px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.4);color:#fca5a5}
+.success{margin-top:12px;padding:10px 12px;border-radius:10px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.4);color:#86efac}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:10px;border-bottom:1px solid #2a2a44;vertical-align:top}
+th{color:#9ca3af;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.table-wrap{overflow-x:auto}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700}
+.active{background:rgba(52,211,153,.12);color:#86efac}
+.inactive{background:rgba(239,68,68,.12);color:#fca5a5}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;word-break:break-all;color:#93c5fd}
 </style>
 </head>
 <body>
@@ -731,13 +602,13 @@ const ADMIN_HTML = `<!DOCTYPE html>
 <script>
 let PW = "";
 
-function setLoginError(msg) {
-  const el = document.getElementById("loginError");
-  el.textContent = msg;
+function setLoginError(msg){
+  const el=document.getElementById("loginError");
+  el.textContent=msg;
   el.classList.remove("hidden");
 }
 
-function clearLoginError() {
+function clearLoginError(){
   document.getElementById("loginError").classList.add("hidden");
 }
 
@@ -754,32 +625,24 @@ async function api(path, options = {}) {
   const contentType = res.headers.get("content-type") || "";
   const data = contentType.includes("application/json") ? await res.json() : await res.text();
 
-  if (!res.ok) {
-    throw new Error((data && data.error) || "Request failed");
-  }
-
+  if (!res.ok) throw new Error((data && data.error) || "Request failed");
   return data;
 }
 
-async function login() {
-  PW = document.getElementById("pw").value.trim();
+async function login(){
+  PW=document.getElementById("pw").value.trim();
   clearLoginError();
-
-  if (!PW) {
-    setLoginError("Enter your admin password.");
-    return;
-  }
-
-  try {
+  if(!PW){setLoginError("Enter your admin password.");return;}
+  try{
     await refreshAll();
     document.getElementById("loginCard").classList.add("hidden");
     document.getElementById("app").classList.remove("hidden");
-  } catch (err) {
+  }catch(err){
     setLoginError(err.message || "Login failed.");
   }
 }
 
-async function refreshAll() {
+async function refreshAll(){
   const [stats, subs] = await Promise.all([
     api("/admin/api/stats"),
     api("/admin/api/subscribers")
@@ -794,18 +657,16 @@ async function refreshAll() {
   renderSubscribers(subs.subscribers || []);
 }
 
-function renderSubscribers(subscribers) {
-  const tbody = document.getElementById("subTable");
-
-  if (!subscribers.length) {
-    tbody.innerHTML = '<tr><td colspan="8">No subscribers found.</td></tr>';
+function renderSubscribers(subscribers){
+  const tbody=document.getElementById("subTable");
+  if(!subscribers.length){
+    tbody.innerHTML='<tr><td colspan="8">No subscribers found.</td></tr>';
     return;
   }
 
   tbody.innerHTML = subscribers.map(sub => {
     const status = sub.status === "active" ? "active" : "inactive";
     const masterUrl = location.origin + "/feed/" + sub.token + "_master.ics";
-
     return \`
       <tr>
         <td>\${escapeHtml(sub.email || "")}</td>
@@ -824,20 +685,18 @@ function renderSubscribers(subscribers) {
             <button class="small-btn btn-danger" onclick="deleteSubscriber('\${sub.token}')">Delete</button>
           </div>
         </td>
-      </tr>
-    \`;
+      </tr>\`;
   }).join("");
 }
 
-async function createSubscriber() {
-  const email = document.getElementById("newEmail").value.trim();
-  const note = document.getElementById("newNote").value.trim();
-  const result = document.getElementById("createResult");
+async function createSubscriber(){
+  const email=document.getElementById("newEmail").value.trim();
+  const note=document.getElementById("newNote").value.trim();
+  const result=document.getElementById("createResult");
+  result.className="success hidden";
+  result.textContent="";
 
-  result.classList.add("hidden");
-  result.textContent = "";
-
-  try {
+  try{
     const data = await api("/admin/api/subscribers", {
       method: "POST",
       body: JSON.stringify({ email, note, feeds: ["master"] })
@@ -845,84 +704,76 @@ async function createSubscriber() {
 
     const feedUrl = location.origin + "/feed/" + data.subscriber.token + "_master.ics";
     result.textContent = "Created. Master feed: " + feedUrl;
+    result.className = "success";
     result.classList.remove("hidden");
-
     document.getElementById("newEmail").value = "";
     document.getElementById("newNote").value = "";
-
     await refreshAll();
-  } catch (err) {
+  }catch(err){
     result.textContent = err.message || "Could not create subscriber.";
     result.className = "error";
     result.classList.remove("hidden");
   }
 }
 
-async function setStatus(token, status) {
-  try {
+async function setStatus(token, status){
+  try{
     await api("/admin/api/subscribers/" + encodeURIComponent(token), {
       method: "PATCH",
       body: JSON.stringify({ status })
     });
     await refreshAll();
-  } catch (err) {
+  }catch(err){
     alert(err.message || "Update failed.");
   }
 }
 
-async function deleteSubscriber(token) {
-  if (!confirm("Delete this subscriber?")) return;
-
-  try {
-    await api("/admin/api/subscribers/" + encodeURIComponent(token), {
-      method: "DELETE"
-    });
+async function deleteSubscriber(token){
+  if(!confirm("Delete this subscriber?")) return;
+  try{
+    await api("/admin/api/subscribers/" + encodeURIComponent(token), { method: "DELETE" });
     await refreshAll();
-  } catch (err) {
+  }catch(err){
     alert(err.message || "Delete failed.");
   }
 }
 
-async function exportEmails() {
+async function exportEmails(){
   const res = await fetch("/admin/api/emails/export", {
     headers: { "X-Admin-Password": PW }
   });
-
-  if (!res.ok) {
-    alert("Export failed.");
-    return;
-  }
+  if(!res.ok){ alert("Export failed."); return; }
 
   const blob = await res.blob();
-  const url = URL.createObjectURL(blob);
+  const dlUrl = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url;
+  a.href = dlUrl;
   a.download = "otakusync-emails.csv";
   a.click();
-  URL.revokeObjectURL(url);
+  URL.revokeObjectURL(dlUrl);
 }
 
-async function copyText(text) {
-  try {
+async function copyText(text){
+  try{
     await navigator.clipboard.writeText(text);
     alert("Copied");
-  } catch {
+  }catch{
     alert("Copy failed");
   }
 }
 
-function escapeHtml(str) {
+function escapeHtml(str){
   return String(str)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#39;");
 }
 
-document.getElementById("pw").addEventListener("keydown", function(e) {
-  if (e.key === "Enter") login();
+document.getElementById("pw").addEventListener("keydown", function(e){
+  if(e.key === "Enter") login();
 });
 </script>
 </body>
-</html>`;
+</html>\`;
