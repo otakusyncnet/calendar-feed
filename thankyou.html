@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>You're Set! — OtakuSync</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--red:#e84040;--gold:#f5c842;--teal:#00d4aa;--dark:#04040f;--dark2:#080820;--dark3:#0d0d2b;--border:rgba(255,255,255,0.08);}
+    body{font-family:'Rajdhani',sans-serif;background:var(--dark);color:#f0f0f0;min-height:100vh;}
+    nav{padding:20px 40px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);}
+    .nav-brand{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.12em;color:#fff;text-decoration:none;}
+    .nav-brand span{color:var(--teal);}
+    .wrap{max-width:760px;margin:0 auto;padding:60px 24px 80px;text-align:center;}
+    .success-icon{font-size:64px;margin-bottom:24px;}
+    .hero-tag{display:inline-block;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.35em;color:var(--teal);border:1px solid rgba(0,212,170,.4);padding:6px 18px;border-radius:2px;margin-bottom:20px;}
+    h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,9vw,96px);line-height:1;color:#fff;margin-bottom:12px;}
+    .sub{font-size:18px;color:rgba(240,240,240,.6);margin-bottom:40px;line-height:1.6;}
+    .feed-box{background:var(--dark2);border:1px solid rgba(0,212,170,.25);border-radius:12px;padding:24px;margin-bottom:16px;text-align:left;}
+    .feed-box-label{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.2em;color:rgba(240,240,240,.4);margin-bottom:8px;}
+    .feed-url-text{font-family:monospace;font-size:13px;color:var(--teal);word-break:break-all;line-height:1.6;}
+    .btns{display:grid;gap:12px;margin-bottom:32px;}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:none;border-radius:3px;padding:16px 24px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.08em;cursor:pointer;text-decoration:none;transition:transform .1s,opacity .15s;}
+    .btn:hover{opacity:.9;transform:translateY(-1px);}
+    .btn-apple{background:#1c1c1e;color:#fff;border:1px solid #3a3a3c;}
+    .btn-copy{background:var(--red);color:#fff;}
+    .btn-email{background:rgba(245,200,66,.15);color:var(--gold);border:1px solid rgba(245,200,66,.3);}
+    .how-box{background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:28px;text-align:left;margin-top:40px;}
+    .how-box h2{font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;margin-bottom:16px;}
+    .how-steps{display:flex;flex-direction:column;gap:14px;}
+    .how-step{display:flex;gap:14px;align-items:flex-start;}
+    .how-num{min-width:28px;height:28px;border-radius:50%;background:rgba(0,212,170,.15);border:1px solid rgba(0,212,170,.3);color:var(--teal);font-weight:700;font-size:13px;display:grid;place-items:center;}
+    .how-text{font-size:15px;color:rgba(240,240,240,.7);line-height:1.5;padding-top:4px;}
+    .how-text strong{color:#fff;}
+    .missing-msg{background:rgba(232,64,64,.1);border:1px solid rgba(232,64,64,.3);border-radius:8px;padding:20px;color:rgba(240,240,240,.7);font-size:15px;text-align:center;}
+    #toast{position:fixed;bottom:20px;right:20px;background:var(--teal);color:#04040f;font-weight:700;padding:12px 20px;border-radius:8px;font-size:14px;display:none;z-index:999;}
+  </style>
+</head>
+<body>
+<nav>
+  <a class="nav-brand" href="/">OTAKU<span>SYNC</span></a>
+</nav>
+<div class="wrap">
+  <div class="success-icon">⚡</div>
+  <div class="hero-tag">Spring 2026 · Feed Ready</div>
+  <h1>You're All Set!</h1>
+  <p class="sub">Your personal OtakuSync calendar link is below. Add it once — your calendar app refreshes it automatically. You'll never need a new link.</p>
+
+  <div id="main-content">
+    <div class="feed-box">
+      <div class="feed-box-label">Your Subscription URL</div>
+      <div class="feed-url-text" id="feed-url-display">Loading...</div>
+    </div>
+    <div class="btns" id="btn-area"></div>
+    <div class="how-box">
+      <h2>How This Works</h2>
+      <div class="how-steps">
+        <div class="how-step"><div class="how-num">1</div><div class="how-text">Your personal feed URL <strong>never changes</strong>. Add it once to your calendar app.</div></div>
+        <div class="how-step"><div class="how-num">2</div><div class="how-text">Your calendar app <strong>auto-refreshes</strong> the content — Apple Calendar checks frequently, Google Calendar roughly once a day.</div></div>
+        <div class="how-step"><div class="how-num">3</div><div class="how-text">When we add shows, fix dates, or update episodes — it <strong>syncs automatically</strong>. No action needed from you.</div></div>
+        <div class="how-step"><div class="how-num">4</div><div class="how-text">Want multiple feeds? <strong><a href="/subscribe" style="color:var(--teal);">Go back</a></strong> and grab the individual platform feeds to color-code your calendar.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toast">Copied!</div>
+<script>
+  function isApple(){return /iPhone|iPad|iPod|Mac/i.test(navigator.userAgent);}
+  function isMobile(){return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);}
+
+  function init() {
+    var params = new URLSearchParams(window.location.search);
+    var feedUrl = params.get('feed');
+
+    if(!feedUrl) {
+      document.getElementById('feed-url-display').textContent = 'No feed URL found. Please go back and subscribe again.';
+      return;
+    }
+
+    document.getElementById('feed-url-display').textContent = feedUrl;
+    var webcal = feedUrl.replace(/^https?:\/\//i, 'webcal://');
+    var mailBody = 'Here is your OtakuSync Spring 2026 calendar link:\n\n' + feedUrl
+      + '\n\nApple Calendar: tap the link to subscribe in one step.\nGoogle Calendar: on a desktop browser, go to Settings → Other calendars → From URL and paste this link.';
+
+    var btns = document.getElementById('btn-area');
+    var html = '';
+    if(isApple()) html += '<a class="btn btn-apple" href="'+webcal+'">🍎 Add to Apple Calendar</a>';
+    html += '<button class="btn btn-copy" onclick="copyFeed()">📋 Copy My Link</button>';
+    html += '<a class="btn btn-email" href="mailto:?subject='+encodeURIComponent('Your OtakuSync Calendar Link')+'&body='+encodeURIComponent(mailBody)+'">✉️ Email Me This Link</a>';
+    btns.innerHTML = html;
+
+    if(isMobile() && !isApple()) {
+      var note = document.createElement('p');
+      note.style.cssText = 'font-size:13px;color:rgba(240,240,240,.4);margin-top:8px;';
+      note.textContent = 'On Android? Email yourself this link, then add it via Google Calendar on desktop.';
+      btns.after(note);
+    }
+  }
+
+  function copyFeed() {
+    var url = document.getElementById('feed-url-display').textContent;
+    navigator.clipboard.writeText(url).catch(function(){
+      var t=document.createElement('textarea');t.value=url;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);
+    });
+    var toast=document.getElementById('toast');toast.style.display='block';
+    setTimeout(function(){toast.style.display='none';},2000);
+  }
+
+  init();
+</script>
+</body>
+</html>

@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OtakuSync — Never Miss an Episode Again</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red:    #e84040;
+      --gold:   #f5c842;
+      --teal:   #00d4aa;
+      --purple: #9b5de5;
+      --dark:   #04040f;
+      --dark2:  #080820;
+      --dark3:  #0d0d2b;
+      --card:   rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.08);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background: var(--dark);
+      color: #f0f0f0;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Anime silhouette panels in background */
+    .bg-panels {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 0;
+      opacity: 0.18;
+      pointer-events: none;
+    }
+
+    .panel {
+      position: relative;
+      overflow: hidden;
+      border-right: 1px solid rgba(255,255,255,0.04);
+    }
+
+    /* AOT — titan silhouette */
+    .panel-aot { background: linear-gradient(180deg, #1a0a00 0%, #3d1500 50%, #1a0a00 100%); }
+    .panel-aot::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 180px;
+      height: 85%;
+      background: #8b3500;
+      clip-path: polygon(38% 0%, 62% 0%, 75% 8%, 80% 20%, 78% 35%, 85% 45%, 82% 55%, 90% 65%, 85% 75%, 78% 80%, 75% 90%, 65% 95%, 60% 100%, 40% 100%, 35% 95%, 25% 90%, 22% 80%, 15% 75%, 10% 65%, 18% 55%, 15% 45%, 22% 35%, 20% 20%, 25% 8%);
+      filter: blur(1px);
+    }
+    .panel-aot::after {
+      content: 'ATTACK ON TITAN';
+      position: absolute;
+      bottom: 40px;
+      left: 0; right: 0;
+      text-align: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      color: #8b3500;
+    }
+
+    /* Demon Slayer — breath forms */
+    .panel-ds { background: linear-gradient(180deg, #000814 0%, #001233 40%, #000814 100%); }
+    .panel-ds::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60px 200px at 30% 70%, rgba(0,150,255,0.3) 0%, transparent 70%),
+        radial-gradient(ellipse 40px 150px at 70% 60%, rgba(255,80,80,0.3) 0%, transparent 70%);
+    }
+    .panel-ds::after {
+      content: 'DEMON SLAYER';
+      position: absolute;
+      bottom: 40px;
+      left: 0; right: 0;
+      text-align: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      color: #1a60c0;
+    }
+
+    /* JJK — cursed energy */
+    .panel-jjk { background: linear-gradient(180deg, #0a0014 0%, #1a0030 50%, #0a0014 100%); }
+    .panel-jjk::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80px 300px at 50% 50%, rgba(155,93,229,0.35) 0%, transparent 70%),
+        radial-gradient(ellipse 60px 100px at 50% 80%, rgba(255,255,255,0.08) 0%, transparent 60%);
+    }
+    .panel-jjk::after {
+      content: 'JUJUTSU KAISEN';
+      position: absolute;
+      bottom: 40px;
+      left: 0; right: 0;
+      text-align: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      color: #7b3daa;
+    }
+
+    /* One Piece — ocean/adventure */
+    .panel-op { background: linear-gradient(180deg, #000c1a 0%, #001a3d 50%, #000c1a 100%); }
+    .panel-op::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 120px 60px at 50% 45%, rgba(245,200,66,0.25) 0%, transparent 70%),
+        radial-gradient(ellipse 200px 40px at 50% 60%, rgba(0,100,200,0.2) 0%, transparent 70%);
+    }
+    .panel-op::after {
+      content: 'ONE PIECE';
+      position: absolute;
+      bottom: 40px;
+      left: 0; right: 0;
+      text-align: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      color: #7a6000;
+    }
+
+    /* Dark overlay gradient on top of panels */
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 40%, rgba(4,4,15,0.6) 0%, transparent 70%),
+        linear-gradient(180deg, rgba(4,4,15,0.7) 0%, rgba(4,4,15,0.3) 40%, rgba(4,4,15,0.8) 100%);
+      pointer-events: none;
+    }
+
+    /* Scanline texture */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.08) 2px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 40px 24px;
+      max-width: 860px;
+    }
+
+    .logo-tag {
+      display: inline-block;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.35em;
+      color: var(--teal);
+      border: 1px solid rgba(0,212,170,0.4);
+      padding: 6px 18px;
+      border-radius: 2px;
+      margin-bottom: 28px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(72px, 12vw, 140px);
+      line-height: 0.9;
+      letter-spacing: 0.02em;
+      color: #fff;
+      text-shadow: 0 0 80px rgba(155,93,229,0.4);
+      animation: fadeUp 0.6s 0.1s ease both;
+      margin-bottom: 8px;
+    }
+
+    .hero-title span {
+      color: var(--gold);
+      display: block;
+    }
+
+    .hero-sub {
+      font-size: 22px;
+      font-weight: 500;
+      color: rgba(240,240,240,0.7);
+      letter-spacing: 0.05em;
+      margin-bottom: 48px;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--red);
+      color: #fff;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 0.1em;
+      padding: 16px 42px;
+      border-radius: 3px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 0 40px rgba(232,64,64,0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 60px rgba(232,64,64,0.5);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: transparent;
+      color: rgba(240,240,240,0.8);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 0.1em;
+      padding: 16px 42px;
+      border-radius: 3px;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.2);
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,0.5);
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0.4;
+      animation: fadeUp 1s 0.8s ease both;
+    }
+    .scroll-hint span {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: #fff;
+    }
+    .scroll-arrow {
+      width: 20px;
+      height: 20px;
+      border-right: 1px solid #fff;
+      border-bottom: 1px solid #fff;
+      transform: rotate(45deg);
+      animation: bounce 1.5s infinite;
+    }
+
+    /* ── STATS STRIP ── */
+    .stats-strip {
+      background: var(--dark2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 28px 40px;
+      display: flex;
+      justify-content: center;
+      gap: 80px;
+      flex-wrap: wrap;
+    }
+    .stat-item {
+      text-align: center;
+    }
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px;
+      line-height: 1;
+      color: var(--gold);
+    }
+    .stat-label {
+      font-size: 13px;
+      letter-spacing: 0.15em;
+      color: rgba(240,240,240,0.5);
+      margin-top: 4px;
+    }
+
+    /* ── WHAT IS IT ── */
+    .section {
+      padding: 100px 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-tag {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.35em;
+      color: var(--teal);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(42px, 6vw, 72px);
+      line-height: 1;
+      color: #fff;
+      margin-bottom: 24px;
+    }
+
+    .section-body {
+      font-size: 18px;
+      font-weight: 400;
+      color: rgba(240,240,240,0.65);
+      line-height: 1.7;
+      max-width: 640px;
+    }
+
+    /* ── FEATURES GRID ── */
+    .features {
+      padding: 0 40px 100px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .feature-card {
+      background: var(--dark2);
+      padding: 40px 36px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.2s ease;
+    }
+    .feature-card:hover { background: var(--dark3); }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent, var(--teal));
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon {
+      font-size: 32px;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .feature-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 0.05em;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .feature-desc {
+      font-size: 16px;
+      color: rgba(240,240,240,0.55);
+      line-height: 1.6;
+    }
+
+    /* ── CALENDAR PREVIEW ── */
+    .preview-section {
+      background: var(--dark2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 100px 40px;
+    }
+
+    .preview-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .preview-text {}
+
+    .cal-mock {
+      background: #0a0a1f;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .cal-header {
+      background: var(--dark3);
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .cal-header-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+    }
+    .cal-header-nav {
+      display: flex;
+      gap: 8px;
+    }
+    .cal-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+
+    .cal-body { padding: 16px; }
+
+    .cal-day-headers {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+    .cal-day-label {
+      text-align: center;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: rgba(240,240,240,0.3);
+      padding: 4px 0;
+    }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .cal-cell {
+      aspect-ratio: 1;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 4px 2px;
+      font-size: 11px;
+      color: rgba(240,240,240,0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cal-cell.has-event {
+      background: rgba(155,93,229,0.12);
+      border: 1px solid rgba(155,93,229,0.2);
+      color: rgba(240,240,240,0.8);
+    }
+    .cal-cell.has-event-red {
+      background: rgba(232,64,64,0.12);
+      border: 1px solid rgba(232,64,64,0.2);
+      color: rgba(240,240,240,0.8);
+    }
+    .cal-cell.has-event-teal {
+      background: rgba(0,212,170,0.12);
+      border: 1px solid rgba(0,212,170,0.2);
+      color: rgba(240,240,240,0.8);
+    }
+    .cal-cell.has-event-gold {
+      background: rgba(245,200,66,0.12);
+      border: 1px solid rgba(245,200,66,0.2);
+      color: rgba(240,240,240,0.8);
+    }
+    .cal-cell.today {
+      background: var(--red);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .cal-event-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      margin-top: 2px;
+    }
+
+    .cal-legend {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: rgba(240,240,240,0.55);
+    }
+    .legend-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+
+    /* ── WHAT YOU GET ── */
+    .includes-section {
+      padding: 100px 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .includes-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-top: 60px;
+    }
+
+    .include-item {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .include-check {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      border-radius: 50%;
+      background: rgba(0,212,170,0.15);
+      border: 1px solid rgba(0,212,170,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--teal);
+      font-size: 14px;
+      margin-top: 3px;
+    }
+
+    .include-text {}
+    .include-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      font-size: 18px;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .include-desc {
+      font-size: 15px;
+      color: rgba(240,240,240,0.5);
+      line-height: 1.5;
+    }
+
+    /* ── SHOWS GRID ── */
+    .shows-section {
+      background: var(--dark2);
+      border-top: 1px solid var(--border);
+      padding: 80px 40px;
+    }
+    .shows-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .shows-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 40px;
+    }
+    .show-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 2px;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      border: 1px solid;
+    }
+    .show-tag.cr  { background: rgba(246,110,36,0.1); border-color: rgba(246,110,36,0.3); color: #f97316; }
+    .show-tag.hd  { background: rgba(0,180,219,0.1);  border-color: rgba(0,180,219,0.3);  color: #22d3ee; }
+    .show-tag.nf  { background: rgba(229,9,20,0.1);   border-color: rgba(229,9,20,0.3);   color: #ef4444; }
+    .show-tag.ap  { background: rgba(0,145,234,0.1);  border-color: rgba(0,145,234,0.3);  color: #38bdf8; }
+
+    /* ── CTA SECTION ── */
+    .cta-section {
+      padding: 120px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(155,93,229,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(52px, 8vw, 96px);
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .cta-sub {
+      font-size: 20px;
+      color: rgba(240,240,240,0.6);
+      margin-bottom: 48px;
+      position: relative;
+    }
+
+    .cta-free-badge {
+      display: inline-block;
+      background: rgba(245,200,66,0.15);
+      border: 1px solid rgba(245,200,66,0.4);
+      color: var(--gold);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 14px;
+      letter-spacing: 0.2em;
+      padding: 6px 20px;
+      border-radius: 2px;
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 0.1em;
+      color: rgba(240,240,240,0.4);
+    }
+    footer p {
+      font-size: 13px;
+      color: rgba(240,240,240,0.3);
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.3s ease, backdrop-filter 0.3s ease;
+    }
+    nav.scrolled {
+      background: rgba(4,4,15,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 0.12em;
+      color: #fff;
+      text-decoration: none;
+    }
+    .nav-brand span { color: var(--teal); }
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+    .nav-links a {
+      color: rgba(240,240,240,0.6);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      transition: color 0.15s;
+    }
+    .nav-links a:hover { color: #fff; }
+
+    .nav-cta {
+      background: var(--red) !important;
+      color: #fff !important;
+      padding: 8px 22px;
+      border-radius: 2px;
+      font-family: 'Bebas Neue', sans-serif !important;
+      font-size: 17px !important;
+      letter-spacing: 0.1em;
+    }
+
+    /* Animations */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: rotate(45deg) translateY(0); }
+      50%       { transform: rotate(45deg) translateY(6px); }
+    }
+
+    /* Scroll reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 768px) {
+      .bg-panels { grid-template-columns: 1fr 1fr; }
+      .panel-op, .panel-aot { display: none; }
+      .preview-inner { grid-template-columns: 1fr; }
+      .includes-grid { grid-template-columns: 1fr; }
+      .stats-strip { gap: 40px; }
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      .section, .features, .includes-section { padding-left: 20px; padding-right: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <a class="nav-brand" href="#">OTAKU<span>SYNC</span></a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#shows">Spring 2026</a>
+      <a href="#signup" class="nav-cta">Get Free Access</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="bg-panels">
+      <div class="panel panel-aot"></div>
+      <div class="panel panel-ds"></div>
+      <div class="panel panel-jjk"></div>
+      <div class="panel panel-op"></div>
+    </div>
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+      <div class="logo-tag">Spring 2026 Season · Now Live</div>
+      <h1 class="hero-title">
+        Never Miss
+        <span>An Episode</span>
+      </h1>
+      <p class="hero-sub">Your anime &amp; manga release schedule, synced directly to your calendar.</p>
+      <div class="hero-cta-group">
+        <a href="#signup" class="btn-primary">⚡ Subscribe Free</a>
+        <a href="#features" class="btn-secondary">See How It Works</a>
+      </div>
+    </div>
+
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-strip reveal">
+    <div class="stat-item">
+      <div class="stat-num">60+</div>
+      <div class="stat-label">Shows Tracked</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">8</div>
+      <div class="stat-label">Streaming Platforms</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">1</div>
+      <div class="stat-label">Tap to Subscribe</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">0</div>
+      <div class="stat-label">Episodes Missed</div>
+    </div>
+  </div>
+
+  <!-- WHAT IS IT -->
+  <section class="section reveal" id="features">
+    <div class="section-tag">What Is OtakuSync</div>
+    <h2 class="section-title">Your Season Schedule,<br>In Your Calendar App.</h2>
+    <p class="section-body">
+      OtakuSync is a live subscription calendar built for anime fans. Add it once — and every new episode, manga chapter, and season premiere automatically shows up in Apple Calendar, Google Calendar, or any app that supports calendar subscriptions. No app to check. No website to remember. It's just there.
+    </p>
+  </section>
+
+  <!-- FEATURES GRID -->
+  <div class="features reveal" id="feature-cards">
+    <div class="features-grid">
+      <div class="feature-card" style="--accent: var(--teal);">
+        <span class="feature-icon">📅</span>
+        <div class="feature-title">Live Calendar Feed</div>
+        <p class="feature-desc">Subscribe once with a unique URL. Every update to the season schedule syncs automatically — no apps, no accounts.</p>
+      </div>
+      <div class="feature-card" style="--accent: var(--red);">
+        <span class="feature-icon">🎌</span>
+        <div class="feature-title">Every Platform Covered</div>
+        <p class="feature-desc">Crunchyroll, HIDIVE, Netflix, Hulu, Prime Video, Disney+ — all tracked and labeled so you know where to watch.</p>
+      </div>
+      <div class="feature-card" style="--accent: var(--purple);">
+        <span class="feature-icon">🔔</span>
+        <div class="feature-title">Episode Reminders</div>
+        <p class="feature-desc">Your calendar app handles the notifications. Set them however you want — 30 minutes before, the morning of, whatever works.</p>
+      </div>
+      <div class="feature-card" style="--accent: var(--gold);">
+        <span class="feature-icon">📱</span>
+        <div class="feature-title">Works on Everything</div>
+        <p class="feature-desc">iPhone, Android, Mac, Windows — if your device has a calendar, OtakuSync works on it. One tap on Apple devices.</p>
+      </div>
+      <div class="feature-card" style="--accent: var(--teal);">
+        <span class="feature-icon">⚡</span>
+        <div class="feature-title">Always Up to Date</div>
+        <p class="feature-desc">When shows move dates, get delayed, or new titles are added mid-season, your calendar updates automatically.</p>
+      </div>
+      <div class="feature-card" style="--accent: var(--red);">
+        <span class="feature-icon">📖</span>
+        <div class="feature-title">Manga Too</div>
+        <p class="feature-desc">Chapter release dates included alongside episodes. Never lose track of where the anime and manga are relative to each other.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALENDAR PREVIEW -->
+  <section class="preview-section">
+    <div class="preview-inner">
+      <div class="preview-text reveal">
+        <div class="section-tag">How It Looks</div>
+        <h2 class="section-title">Your Calendar,<br>Upgraded.</h2>
+        <p class="section-body">Events drop right into your existing calendar view. No separate app. Color-coded by platform so you know at a glance what's on Crunchyroll vs Netflix tonight.</p>
+        <br><br>
+        <div class="include-item" style="margin-bottom: 16px;">
+          <div class="include-check">✓</div>
+          <div class="include-text">
+            <div class="include-title">Show name + episode number</div>
+          </div>
+        </div>
+        <div class="include-item" style="margin-bottom: 16px;">
+          <div class="include-check">✓</div>
+          <div class="include-text">
+            <div class="include-title">Streaming platform labeled</div>
+          </div>
+        </div>
+        <div class="include-item">
+          <div class="include-check">✓</div>
+          <div class="include-text">
+            <div class="include-title">CDT airtimes for simulcasts</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <div class="cal-mock">
+          <div class="cal-header">
+            <div class="cal-header-title">April 2026</div>
+            <div class="cal-header-nav">
+              <div class="cal-dot" style="background:#ef4444;"></div>
+              <div class="cal-dot" style="background:#f59e0b;"></div>
+              <div class="cal-dot" style="background:#22c55e;"></div>
+            </div>
+          </div>
+          <div class="cal-body">
+            <div class="cal-day-headers">
+              <div class="cal-day-label">S</div>
+              <div class="cal-day-label">M</div>
+              <div class="cal-day-label">T</div>
+              <div class="cal-day-label">W</div>
+              <div class="cal-day-label">T</div>
+              <div class="cal-day-label">F</div>
+              <div class="cal-day-label">S</div>
+            </div>
+            <div class="cal-grid">
+              <!-- Row 1 -->
+              <div class="cal-cell"></div>
+              <div class="cal-cell"></div>
+              <div class="cal-cell">1</div>
+              <div class="cal-cell has-event-teal">2<div class="cal-event-dot" style="background:#00d4aa;"></div></div>
+              <div class="cal-cell">3</div>
+              <div class="cal-cell has-event">4<div class="cal-event-dot" style="background:#9b5de5;"></div></div>
+              <div class="cal-cell has-event-red">5<div class="cal-event-dot" style="background:#e84040;"></div></div>
+              <!-- Row 2 -->
+              <div class="cal-cell has-event">6<div class="cal-event-dot" style="background:#9b5de5;"></div></div>
+              <div class="cal-cell has-event-gold">7<div class="cal-event-dot" style="background:#f5c842;"></div></div>
+              <div class="cal-cell has-event">8<div class="cal-event-dot" style="background:#9b5de5;"></div></div>
+              <div class="cal-cell">9</div>
+              <div class="cal-cell has-event-red">10<div class="cal-event-dot" style="background:#e84040;"></div></div>
+              <div class="cal-cell has-event">11<div class="cal-event-dot" style="background:#9b5de5;"></div></div>
+              <div class="cal-cell has-event-teal">12<div class="cal-event-dot" style="background:#00d4aa;"></div></div>
+              <!-- Row 3 -->
+              <div class="cal-cell today">13</div>
+              <div class="cal-cell has-event-gold">14<div class="cal-event-dot" style="background:#f5c842;"></div></div>
+              <div class="cal-cell has-event">15<div class="cal-event-dot" style="background:#9b5de5;"></div></div>
+              <div class="cal-cell has-event-red">16<div class="cal-event-dot" style="background:#e84040;"></div></div>
+              <div class="cal-cell">17</div>
+              <div class="cal-cell has-event">18<div class="cal-event-dot" style="background:#9b5de5;"></div></div>
+              <div class="cal-cell has-event-teal">19<div class="cal-event-dot" style="background:#00d4aa;"></div></div>
+              <!-- Row 4 -->
+              <div class="cal-cell has-event-red">20<div class="cal-event-dot" style="background:#e84040;"></div></div>
+              <div class="cal-cell has-event-gold">21<div class="cal-event-dot" style="background:#f5c842;"></div></div>
+              <div class="cal-cell has-event">22<div class="cal-event-dot" style="background:#9b5de5;"></div></div>
+              <div class="cal-cell">23</div>
+              <div class="cal-cell has-event-teal">24<div class="cal-event-dot" style="background:#00d4aa;"></div></div>
+              <div class="cal-cell has-event">25<div class="cal-event-dot" style="background:#9b5de5;"></div></div>
+              <div class="cal-cell has-event-red">26<div class="cal-event-dot" style="background:#e84040;"></div></div>
+              <!-- Row 5 -->
+              <div class="cal-cell">27</div>
+              <div class="cal-cell has-event-gold">28<div class="cal-event-dot" style="background:#f5c842;"></div></div>
+              <div class="cal-cell has-event">29<div class="cal-event-dot" style="background:#9b5de5;"></div></div>
+              <div class="cal-cell has-event-teal">30<div class="cal-event-dot" style="background:#00d4aa;"></div></div>
+              <div class="cal-cell"></div>
+              <div class="cal-cell"></div>
+              <div class="cal-cell"></div>
+            </div>
+          </div>
+          <div class="cal-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#f97316;"></div> Crunchyroll</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#22d3ee;"></div> HIDIVE</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#ef4444;"></div> Netflix</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#f5c842;"></div> Prime / Hulu</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT YOU GET -->
+  <section class="includes-section reveal">
+    <div class="section-tag">What's Included</div>
+    <h2 class="section-title">Everything in the<br>Spring 2026 Feed</h2>
+    <div class="includes-grid">
+      <div class="include-item"><div class="include-check">✓</div><div class="include-text"><div class="include-title">Re:ZERO Season 4</div><div class="include-desc">Crunchyroll · Wednesdays</div></div></div>
+      <div class="include-item"><div class="include-check">✓</div><div class="include-text"><div class="include-title">JoJo's: Steel Ball Run</div><div class="include-desc">Netflix · Weekly episodes</div></div></div>
+      <div class="include-item"><div class="include-check">✓</div><div class="include-text"><div class="include-title">One Piece: Elbaph Arc</div><div class="include-desc">Crunchyroll + Netflix · Sundays</div></div></div>
+      <div class="include-item"><div class="include-check">✓</div><div class="include-text"><div class="include-title">Witch Hat Atelier</div><div class="include-desc">Crunchyroll · Mondays</div></div></div>
+      <div class="include-item"><div class="include-check">✓</div><div class="include-text"><div class="include-title">Ascendance of a Bookworm</div><div class="include-desc">Crunchyroll · Saturdays</div></div></div>
+      <div class="include-item"><div class="include-check">✓</div><div class="include-text"><div class="include-title">LIAR GAME</div><div class="include-desc">Crunchyroll · Mondays</div></div></div>
+      <div class="include-item"><div class="include-check">✓</div><div class="include-text"><div class="include-title">Agents of the Four Seasons</div><div class="include-desc">Crunchyroll · WIT Studio</div></div></div>
+      <div class="include-item"><div class="include-check">✓</div><div class="include-text"><div class="include-title">60+ More Shows</div><div class="include-desc">Full season coverage, all platforms</div></div></div>
+    </div>
+  </section>
+
+  <!-- SHOWS TAGGED -->
+  <section class="shows-section" id="shows">
+    <div class="shows-inner">
+      <div class="section-tag reveal">Spring 2026 Lineup</div>
+      <h2 class="section-title reveal">All Platforms, One Feed</h2>
+      <div class="shows-grid reveal">
+        <span class="show-tag cr">🟠 Re:ZERO S4</span>
+        <span class="show-tag nf">🔴 JoJo Steel Ball Run</span>
+        <span class="show-tag cr">🟠 One Piece Elbaph</span>
+        <span class="show-tag cr">🟠 Witch Hat Atelier</span>
+        <span class="show-tag hd">🔵 Dorohedoro S2</span>
+        <span class="show-tag cr">🟠 Ascendance of Bookworm</span>
+        <span class="show-tag cr">🟠 LIAR GAME</span>
+        <span class="show-tag cr">🟠 Iruma-kun S4</span>
+        <span class="show-tag cr">🟠 MARRIAGETOXIN</span>
+        <span class="show-tag cr">🟠 Rent-a-Girlfriend S5</span>
+        <span class="show-tag ap">🔷 Agents Four Seasons</span>
+        <span class="show-tag cr">🟠 Rooster Fighter</span>
+        <span class="show-tag cr">🟠 Kusunoki's Garden</span>
+        <span class="show-tag cr">🟠 Eren the Southpaw</span>
+        <span class="show-tag hd">🔵 Ghost Concert</span>
+        <span class="show-tag cr">🟠 + 45 More Shows</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" id="signup">
+    <div class="cta-free-badge reveal">⭐ Free for Spring 2026 Season</div>
+    <h2 class="cta-title reveal">Add It to Your<br>Calendar Right Now</h2>
+    <p class="cta-sub reveal">One link. Tap once. Never think about episode schedules again.</p>
+    <div class="hero-cta-group reveal">
+      <a href="https://otakusync.net/subscribe" class="btn-primary">⚡ Get My Free Calendar Feed</a>
+    </div>
+    <p style="margin-top: 24px; font-size: 14px; color: rgba(240,240,240,0.3); position: relative;">
+      Works with Apple Calendar, Google Calendar, Outlook, and more.
+    </p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-brand">OtakuSync</div>
+    <p>Spring 2026 · Built for fans, by fans · otakusync.net</p>
+  </footer>
+
+  <script>
+    // Sticky nav
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    });
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
