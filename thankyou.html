@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>You're In — OtakuSync</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Rajdhani',sans-serif;background:#04040f;color:#f0f0f0;min-height:100vh}
+nav{padding:20px 40px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.07)}
+.brand{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.12em;color:#fff;text-decoration:none}
+.brand span{color:#00d4aa}
+.wrap{max-width:680px;margin:0 auto;padding:56px 24px 80px}
+
+.hero{text-align:center;margin-bottom:48px}
+.checkmark{width:72px;height:72px;border-radius:50%;background:rgba(0,212,170,.15);border:2px solid rgba(0,212,170,.4);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 20px}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:52px;color:#fff;line-height:1;margin-bottom:8px}
+.hero p{font-size:16px;color:rgba(255,255,255,.5);line-height:1.6}
+
+.feeds-label{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.15em;color:rgba(255,255,255,.3);margin-bottom:16px}
+
+.feed-card{background:#080820;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:22px 24px;margin-bottom:14px}
+.feed-top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.feed-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.feed-name{font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff}
+.feed-count{font-size:12px;color:rgba(255,255,255,.35);font-weight:600;letter-spacing:.06em;margin-left:auto}
+.feed-url{background:#04040f;border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.35);word-break:break-all;margin-bottom:14px;font-family:monospace}
+.feed-actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn-apple{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.06em;padding:11px 20px;background:#00d4aa;color:#04040f;border:none;border-radius:7px;cursor:pointer;text-decoration:none;display:inline-block;transition:opacity .15s}
+.btn-apple:hover{opacity:.85}
+.btn-google{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.06em;padding:11px 20px;background:transparent;color:#00d4aa;border:1.5px solid rgba(0,212,170,.4);border-radius:7px;cursor:pointer;text-decoration:none;display:inline-block;transition:all .15s}
+.btn-google:hover{background:rgba(0,212,170,.08)}
+.btn-copy{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.06em;padding:11px 20px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.1);border-radius:7px;cursor:pointer;transition:all .15s}
+.btn-copy:hover{background:rgba(255,255,255,.1)}
+.btn-copy.copied{color:#00d4aa;border-color:rgba(0,212,170,.4)}
+
+.instructions{background:#080820;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:28px;margin-top:24px}
+.instructions h3{font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;margin-bottom:16px}
+.step-list{list-style:none}
+.step-list li{display:flex;gap:12px;font-size:15px;color:rgba(255,255,255,.6);padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);line-height:1.5}
+.step-list li:last-child{border:none}
+.step-list li b{font-family:'Bebas Neue',sans-serif;font-size:18px;color:#00d4aa;flex-shrink:0;width:22px}
+
+.share-prompt{text-align:center;margin-top:36px;padding-top:36px;border-top:1px solid rgba(255,255,255,.07)}
+.share-prompt h3{font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;margin-bottom:8px}
+.share-prompt p{font-size:14px;color:rgba(255,255,255,.4);margin-bottom:16px}
+.share-link{display:inline-block;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.08em;padding:12px 28px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#fff;text-decoration:none;transition:background .15s}
+.share-link:hover{background:rgba(255,255,255,.1)}
+</style>
+</head>
+<body>
+<nav>
+  <a class="brand" href="/">OTAKU<span>SYNC</span></a>
+</nav>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="checkmark">✓</div>
+    <h1>You're All Set!</h1>
+    <p>Your personal calendar feeds are ready. Add them to any calendar app and never miss a drop again.</p>
+  </div>
+
+  <div class="feeds-label">YOUR FEED LINKS</div>
+  <div id="feed-list"><!-- populated by JS --></div>
+
+  <div class="instructions">
+    <h3>How to Subscribe</h3>
+    <ul class="step-list">
+      <li><b>1</b><span><strong style="color:#fff">Apple Calendar:</strong> Click "Add to Apple Calendar" — it opens directly and auto-syncs.</span></li>
+      <li><b>2</b><span><strong style="color:#fff">Google Calendar:</strong> Click "Add to Google" or copy the URL and paste it under "Other calendars → From URL".</span></li>
+      <li><b>3</b><span><strong style="color:#fff">Any other app:</strong> Copy the URL and look for "Subscribe", "Add by URL", or "Import from web".</span></li>
+      <li><b>4</b><span>Your calendar app will check for updates automatically. New episodes and chapters appear as they're scheduled.</span></li>
+    </ul>
+  </div>
+
+  <div class="share-prompt">
+    <h3>Know a Fellow Weeb?</h3>
+    <p>Share OtakuSync and help them stay synced this season.</p>
+    <a class="share-link" href="/">otakusync.net</a>
+  </div>
+
+</div>
+<script>
+var FEED_INFO = {
+  master:      {name:'Everything — All Platforms', dot:'#00d4aa', count:'611 events'},
+  crunchyroll: {name:'Crunchyroll',                dot:'#F47521', count:'491 episodes'},
+  netflix:     {name:'Netflix',                    dot:'#E50914', count:'45 episodes'},
+  hidive:      {name:'HIDIVE',                     dot:'#00B4DB', count:'55 episodes'},
+  manga:       {name:'Manga & Light Novels',       dot:'#4B6FDF', count:'11 release days'},
+  manhwa:      {name:'Manhwa',                     dot:'#8B5CF6', count:'5 release days'},
+  manhua:      {name:'Manhua',                     dot:'#10B981', count:'4 release days'},
+};
+
+function getParams(){
+  var p=new URLSearchParams(window.location.search);
+  var feeds=p.getAll('feed');
+  var email=p.get('email')||'';
+  return {feeds:feeds,email:email};
+}
+
+function feedUrl(key){
+  return 'https://otakusync.net/feeds/'+key+'.ics';
+}
+function webcalUrl(key){
+  return 'webcal://otakusync.net/feeds/'+key+'.ics';
+}
+function googleUrl(key){
+  return 'https://calendar.google.com/calendar/r?cid='+encodeURIComponent('https://otakusync.net/feeds/'+key+'.ics');
+}
+
+function copyUrl(key, btnId){
+  var url=feedUrl(key);
+  navigator.clipboard.writeText(url).then(function(){
+    var btn=document.getElementById(btnId);
+    btn.textContent='✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(function(){btn.textContent='Copy URL';btn.classList.remove('copied');},2000);
+  }).catch(function(){
+    var btn=document.getElementById(btnId);
+    btn.textContent='Copy URL';
+    prompt('Copy this URL:',url);
+  });
+}
+
+function renderFeeds(){
+  var params=getParams();
+  var feeds=params.feeds;
+  if(!feeds||!feeds.length){feeds=['master'];}
+  var container=document.getElementById('feed-list');
+  container.innerHTML='';
+  feeds.forEach(function(key){
+    var info=FEED_INFO[key]||{name:key,dot:'#00d4aa',count:''};
+    var url=feedUrl(key);
+    var btnId='copy-'+key;
+    var div=document.createElement('div');
+    div.className='feed-card';
+    div.innerHTML=
+      '<div class="feed-top">'+
+        '<div class="feed-dot" style="background:'+info.dot+'"></div>'+
+        '<div class="feed-name">'+info.name+'</div>'+
+        '<div class="feed-count">'+info.count+'</div>'+
+      '</div>'+
+      '<div class="feed-url">'+url+'</div>'+
+      '<div class="feed-actions">'+
+        '<a class="btn-apple" href="'+webcalUrl(key)+'" target="_blank">🗓 Add to Apple Calendar</a>'+
+        '<a class="btn-google" href="'+googleUrl(key)+'" target="_blank">Add to Google</a>'+
+        '<button class="btn-copy" id="'+btnId+'" onclick="copyUrl(\''+key+'\',\''+btnId+'\')">Copy URL</button>'+
+      '</div>';
+    container.appendChild(div);
+  });
+}
+
+renderFeeds();
+</script>
+</body>
+</html>

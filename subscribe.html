@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Subscribe — OtakuSync</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Rajdhani',sans-serif;background:#04040f;color:#f0f0f0;min-height:100vh}
+nav{padding:20px 40px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.07)}
+.brand{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.12em;color:#fff;text-decoration:none}
+.brand span{color:#00d4aa}
+.back{color:rgba(255,255,255,.5);text-decoration:none;font-size:15px;font-weight:600}
+.back:hover{color:#fff}
+.wrap{max-width:640px;margin:0 auto;padding:56px 24px 80px}
+
+/* steps */
+.steps{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:48px}
+.s{display:flex;align-items:center;gap:8px}
+.s-num{width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,255,255,.15);color:rgba(255,255,255,.3);font-family:'Bebas Neue',sans-serif;font-size:17px;display:flex;align-items:center;justify-content:center;transition:all .3s}
+.s-num.on{border-color:#00d4aa;color:#00d4aa;background:rgba(0,212,170,.1)}
+.s-num.done{border-color:#00d4aa;background:#00d4aa;color:#04040f}
+.s-lbl{font-size:13px;font-weight:700;letter-spacing:.06em;color:rgba(255,255,255,.3);transition:color .3s}
+.s-lbl.on{color:#fff}
+.line{width:48px;height:1px;background:rgba(255,255,255,.1);margin:0 6px}
+
+/* cards */
+.card{background:#080820;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:40px}
+.card.gone{display:none}
+.card h2{font-family:'Bebas Neue',sans-serif;font-size:44px;color:#fff;line-height:1;margin-bottom:8px}
+.card p{font-size:16px;color:rgba(255,255,255,.55);line-height:1.65;margin-bottom:28px}
+
+/* email step */
+.erow{display:flex;gap:10px}
+.einput{flex:1;padding:14px 18px;background:#04040f;border:1.5px solid rgba(255,255,255,.1);border-radius:8px;color:#f0f0f0;font-size:16px;font-family:'Rajdhani',sans-serif;font-weight:600;transition:border-color .2s}
+.einput:focus{outline:none;border-color:#00d4aa}
+.einput.err{border-color:#e84040}
+.ebtn{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.08em;padding:14px 28px;background:#00d4aa;color:#04040f;border:none;border-radius:8px;cursor:pointer;white-space:nowrap;transition:opacity .15s}
+.ebtn:hover{opacity:.85}
+.ebtn:disabled{opacity:.45;cursor:not-allowed}
+.errmsg{font-size:13px;color:#e84040;margin-top:8px;min-height:18px}
+.fnote{font-size:12px;color:rgba(255,255,255,.25);margin-top:10px}
+
+/* feed picker */
+.modegrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.mcard{background:#0d0d2b;border:2px solid rgba(255,255,255,.08);border-radius:12px;padding:24px 20px;cursor:pointer;transition:border-color .2s,background .2s;position:relative;user-select:none}
+.mcard:hover{background:rgba(255,255,255,.02)}
+.mcard.sel{border-color:#00d4aa;background:rgba(0,212,170,.06)}
+.mcard.sel::after{content:'✓';position:absolute;top:12px;right:14px;width:22px;height:22px;border-radius:50%;background:#00d4aa;color:#04040f;font-weight:800;font-size:12px;display:grid;place-items:center}
+.micon{font-size:26px;margin-bottom:10px}
+.mname{font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;margin-bottom:4px}
+.mdesc{font-size:13px;color:rgba(255,255,255,.45);line-height:1.5}
+.mbadge{display:inline-block;margin-top:8px;font-size:11px;letter-spacing:.08em;font-weight:700;padding:3px 8px;border-radius:2px;background:rgba(0,212,170,.12);color:#00d4aa;border:1px solid rgba(0,212,170,.25)}
+
+/* platform grid */
+.psec{display:none;margin-bottom:20px}
+.psec.show{display:block}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:480px){.pgrid{grid-template-columns:1fr 1fr}.modegrid{grid-template-columns:1fr}}
+.pcard{background:#0d0d2b;border:2px solid rgba(255,255,255,.08);border-radius:10px;padding:16px 14px;cursor:pointer;transition:border-color .2s;position:relative;user-select:none}
+.pcard:hover{background:rgba(255,255,255,.02)}
+.pcard.sel{border-color:#00d4aa}
+.pcard.sel::after{content:'✓';position:absolute;top:8px;right:10px;width:18px;height:18px;border-radius:50%;background:#00d4aa;color:#04040f;font-weight:800;font-size:10px;display:grid;place-items:center}
+.pdot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-bottom:8px}
+.pname{font-family:'Bebas Neue',sans-serif;font-size:19px;color:#fff;margin-bottom:2px}
+.psub{font-size:11px;color:rgba(255,255,255,.4)}
+.pdiv{height:1px;background:rgba(255,255,255,.07);margin:20px 0}
+
+.getbtn{display:block;width:100%;font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.1em;padding:18px;background:#e84040;color:#fff;border:none;border-radius:8px;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 0 40px rgba(232,64,64,.25)}
+.getbtn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 4px 60px rgba(232,64,64,.45)}
+.getbtn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.getnote{text-align:center;font-size:12px;color:rgba(255,255,255,.25);margin-top:10px}
+
+.spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<nav>
+  <a class="brand" href="/">OTAKU<span>SYNC</span></a>
+  <a class="back" href="/">← Home</a>
+</nav>
+<div class="wrap">
+
+  <div class="steps">
+    <div class="s"><div class="s-num on" id="n1">1</div><div class="s-lbl on" id="l1">Your Email</div></div>
+    <div class="line"></div>
+    <div class="s"><div class="s-num" id="n2">2</div><div class="s-lbl" id="l2">Pick Feeds</div></div>
+    <div class="line"></div>
+    <div class="s"><div class="s-num" id="n3">3</div><div class="s-lbl" id="l3">Get Links</div></div>
+  </div>
+
+  <!-- STEP 1: EMAIL -->
+  <div class="card" id="c1">
+    <h2>Get Your Feed</h2>
+    <p>Enter your email to generate your personal calendar link. We use it to send you Summer 2026 updates — no spam, ever.</p>
+    <div class="erow">
+      <input class="einput" id="ei" type="email" placeholder="your@email.com" autocomplete="email"/>
+      <button class="ebtn" id="eb" onclick="goStep2()">Next →</button>
+    </div>
+    <div class="errmsg" id="em"></div>
+    <div class="fnote">By continuing you agree to receive OtakuSync seasonal updates. Unsubscribe anytime.</div>
+  </div>
+
+  <!-- STEP 2: FEED PICKER -->
+  <div class="card gone" id="c2">
+    <h2>Build Your Feed</h2>
+    <p>One feed for everything, or separate color-coded feeds per platform. Subscribe once — auto-updates forever.</p>
+
+    <div class="modegrid">
+      <div class="mcard" id="mc-master" onclick="pick('master')">
+        <div class="micon">⚡</div>
+        <div class="mname">Everything</div>
+        <div class="mdesc">All anime, manga, manhwa & manhua. All platforms in one feed.</div>
+        <div class="mbadge">611 events · Simplest option</div>
+      </div>
+      <div class="mcard" id="mc-custom" onclick="pick('custom')">
+        <div class="micon">🎛️</div>
+        <div class="mname">Pick My Feeds</div>
+        <div class="mdesc">Choose platforms. Each becomes a separate color-coded calendar.</div>
+        <div class="mbadge" style="background:rgba(245,200,66,.1);color:#f5c842;border-color:rgba(245,200,66,.25)">Custom · Color-coded</div>
+      </div>
+    </div>
+
+    <div class="psec" id="ps">
+      <div class="pgrid">
+        <div class="pcard" id="p-crunchyroll" onclick="tog('crunchyroll')">
+          <div class="pdot" style="background:#F47521"></div>
+          <div class="pname">Crunchyroll</div><div class="psub">491 episodes</div>
+        </div>
+        <div class="pcard" id="p-netflix" onclick="tog('netflix')">
+          <div class="pdot" style="background:#E50914"></div>
+          <div class="pname">Netflix</div><div class="psub">45 episodes</div>
+        </div>
+        <div class="pcard" id="p-hidive" onclick="tog('hidive')">
+          <div class="pdot" style="background:#00B4DB"></div>
+          <div class="pname">HIDIVE</div><div class="psub">55 episodes</div>
+        </div>
+        <div class="pcard" id="p-manga" onclick="tog('manga')">
+          <div class="pdot" style="background:#4B6FDF"></div>
+          <div class="pname">Manga</div><div class="psub">11 release days</div>
+        </div>
+        <div class="pcard" id="p-manhwa" onclick="tog('manhwa')">
+          <div class="pdot" style="background:#8B5CF6"></div>
+          <div class="pname">Manhwa</div><div class="psub">5 release days</div>
+        </div>
+        <div class="pcard" id="p-manhua" onclick="tog('manhua')">
+          <div class="pdot" style="background:#10B981"></div>
+          <div class="pname">Manhua</div><div class="psub">4 release days</div>
+        </div>
+      </div>
+      <div class="pdiv"></div>
+    </div>
+
+    <button class="getbtn" id="gb" onclick="goStep3()" disabled>⚡ Get My Calendar Feed</button>
+    <div class="getnote">Free for Spring 2026 · Works with Apple Calendar, Google Calendar & more</div>
+  </div>
+
+</div>
+<script>
+var email='', mode=null, sel=new Set();
+
+function setSteps(cur){
+  [1,2,3].forEach(function(i){
+    var n=document.getElementById('n'+i), l=document.getElementById('l'+i);
+    if(i<cur){n.className='s-num done';n.textContent='✓';l.className='s-lbl on';}
+    else if(i===cur){n.className='s-num on';l.className='s-lbl on';}
+    else{n.className='s-num';l.className='s-lbl';}
+  });
+}
+
+function goStep2(){
+  var inp=document.getElementById('ei');
+  var v=inp.value.trim();
+  var em=document.getElementById('em');
+  em.textContent='';
+  inp.classList.remove('err');
+  if(!v||!v.includes('@')||!v.includes('.')){
+    inp.classList.add('err');
+    em.textContent='Please enter a valid email address.';
+    return;
+  }
+  email=v;
+  var btn=document.getElementById('eb');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spin"></span>Saving...';
+  fetch('/api/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,feeds:['pending']})})
+    .catch(function(){})
+    .finally(function(){
+      btn.innerHTML='✓ Got it!';
+      setTimeout(function(){
+        document.getElementById('c1').classList.add('gone');
+        document.getElementById('c2').classList.remove('gone');
+        setSteps(2);
+        window.scrollTo({top:0,behavior:'smooth'});
+      },350);
+    });
+}
+
+function pick(m){
+  mode=m;
+  document.getElementById('mc-master').classList.toggle('sel',m==='master');
+  document.getElementById('mc-custom').classList.toggle('sel',m==='custom');
+  document.getElementById('ps').classList.toggle('show',m==='custom');
+  if(m==='master'){sel.clear();['crunchyroll','netflix','hidive','manga','manhwa','manhua'].forEach(function(k){document.getElementById('p-'+k).classList.remove('sel');});}
+  chkBtn();
+}
+
+function tog(k){
+  var el=document.getElementById('p-'+k);
+  if(sel.has(k)){sel.delete(k);el.classList.remove('sel');}
+  else{sel.add(k);el.classList.add('sel');}
+  chkBtn();
+}
+
+function chkBtn(){
+  var ok=(mode==='master')||(mode==='custom'&&sel.size>0);
+  document.getElementById('gb').disabled=!ok;
+}
+
+function goStep3(){
+  var keys=mode==='master'?['master']:Array.from(sel);
+  if(!keys.length)return;
+  var btn=document.getElementById('gb');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spin"></span>Building your feeds...';
+  fetch('/api/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,feeds:keys})})
+    .catch(function(){})
+    .finally(function(){
+      var p=new URLSearchParams();
+      p.set('email',email);
+      keys.forEach(function(k){p.append('feed',k);});
+      window.location.href='/thankyou?'+p.toString();
+    });
+}
+
+document.getElementById('ei').addEventListener('keydown',function(e){if(e.key==='Enter')goStep2();});
+</script>
+</body>
+</html>
