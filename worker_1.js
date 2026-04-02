@@ -1,5 +1,7 @@
-const RAW_BASE = "https://raw.githubusercontent.com/otakusyncnet/calendar-feed/main";
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 
+const RAW_BASE = "https://raw.githubusercontent.com/otakusyncnet/calendar-feed/main";
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
@@ -9,14 +11,28 @@ const CORS = {
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: { ...CORS, "Content-Type": "application/json; charset=UTF-8" } });
 }
+__name(json, "json");
+
 function html(body, status = 200) {
   return new Response(body, { status, headers: { "Content-Type": "text/html; charset=UTF-8" } });
 }
+__name(html, "html");
+
 function normalizeEmail(e) { return String(e || "").trim().toLowerCase(); }
+__name(normalizeEmail, "normalizeEmail");
+
 function emailKey(e) { return "email:" + normalizeEmail(e).replace(/[^a-zA-Z0-9]/g, "_"); }
+__name(emailKey, "emailKey");
+
 function tokenKey(t) { return "token:" + t; }
+__name(tokenKey, "tokenKey");
+
 function subKey(t) { return "sub:" + t; }
+__name(subKey, "subKey");
+
 function makeToken() { return crypto.randomUUID().replace(/-/g, "").slice(0, 16); }
+__name(makeToken, "makeToken");
+
 function guessContentType(path) {
   if (path.endsWith(".html")) return "text/html; charset=UTF-8";
   if (path.endsWith(".ics"))  return "text/calendar; charset=UTF-8";
@@ -27,9 +43,13 @@ function guessContentType(path) {
   if (path.endsWith(".svg"))  return "image/svg+xml";
   return "text/plain; charset=UTF-8";
 }
+__name(guessContentType, "guessContentType");
+
 async function fetchRaw(path) {
   return fetch(RAW_BASE + path, { headers: { "User-Agent": "OtakuSync-Worker" } });
 }
+__name(fetchRaw, "fetchRaw");
+
 async function proxyRawFile(path) {
   const resp = await fetchRaw(path);
   if (!resp.ok) return new Response("Not found", { status: 404 });
@@ -38,6 +58,7 @@ async function proxyRawFile(path) {
     headers: { "Content-Type": guessContentType(path), "Cache-Control": "max-age=60" },
   });
 }
+__name(proxyRawFile, "proxyRawFile");
 
 export default {
   async fetch(request, env) {
@@ -46,7 +67,7 @@ export default {
     try {
       if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
 
-      // Admin page — served from GitHub, no HTML inlined in worker
+      // Admin page — served from GitHub
       if (path === "/admin" || path === "/admin/") return proxyRawFile("/admin.html");
 
       if (path.startsWith("/admin/api/")) return handleAdminAPI(request, env, path, url);
@@ -82,6 +103,7 @@ async function handleSignup(request, env, url) {
   await env.ANIME_CAL.put(subKey(token), JSON.stringify({ token, email, note: "Self-signup", feeds, created: now, status: "active", lastSync: null, syncCount: 0 }));
   return json({ success: true, existing: false, token, feeds });
 }
+__name(handleSignup, "handleSignup");
 
 async function handleTokenFeed(request, env, url) {
   if (!env.ANIME_CAL) return new Response("KV binding missing.", { status: 503 });
@@ -109,10 +131,11 @@ async function handleTokenFeed(request, env, url) {
   }
   return new Response(await feedResp.text(), { status: 200, headers: { "Content-Type": "text/calendar; charset=UTF-8", "Cache-Control": "max-age=3600" } });
 }
+__name(handleTokenFeed, "handleTokenFeed");
 
 async function handleAdminAPI(request, env, path, url) {
   if (!env.ANIME_CAL) return json({ error: "KV binding missing" }, 503);
-  // Password comes ONLY from Cloudflare Secrets Store — never hardcoded
+  // Password comes from Cloudflare Secrets Store
   if (!env.ADMIN_PASSWORD) return json({ error: "Admin password not configured" }, 503);
   const pw = request.headers.get("X-Admin-Password");
   if (pw !== env.ADMIN_PASSWORD) return json({ error: "Unauthorized" }, 401);
@@ -166,3 +189,5 @@ async function handleAdminAPI(request, env, path, url) {
   }
   return json({ error: "Not found" }, 404);
 }
+__name(handleAdminAPI, "handleAdminAPI");
+`*_
