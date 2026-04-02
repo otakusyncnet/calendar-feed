@@ -1,13 +1,7 @@
 name = "anime-calendar"
-
 main = "worker.js"
-
-compatibility_date = "2024-01-01"
+compatibility_date = "2026-04-01"
 
 [[kv_namespaces]]
-
 binding = "ANIME_CAL"
-
 id = "19c5924046d54adbba3992c53775493f"
-
-# trigger build
