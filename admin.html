@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>OtakuSync Admin</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0d0d1a;color:#e5e7eb;min-height:100vh}
+.wrap{max-width:1100px;margin:0 auto;padding:24px}
+h1{font-size:28px;color:white;margin-bottom:4px}
+.sub{color:#9ca3af;margin-bottom:20px}
+.card{background:#17172a;border:1px solid #2a2a44;border-radius:16px;padding:20px;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:18px}
+.stat{background:#111122;border:1px solid #2a2a44;border-radius:14px;padding:18px;text-align:center}
+.stat .num{font-size:32px;font-weight:800;color:#34d399}
+.stat .lbl{margin-top:6px;color:#9ca3af;font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+input,button{font:inherit}
+input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #374151;background:#0b1020;color:white}
+input:focus{outline:none;border-color:#34d399}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>*{flex:1;min-width:180px}
+button{padding:12px 16px;border:0;border-radius:10px;cursor:pointer;font-weight:700;transition:opacity .15s}
+button:hover{opacity:.85}
+.btn-green{background:#34d399;color:#08110f}
+.btn-red{background:#ef4444;color:white}
+.btn-gray{background:#374151;color:white}
+.btn-yellow{background:#f59e0b;color:black}
+.btn-sm{padding:7px 10px;border-radius:8px;font-size:12px}
+.hidden{display:none}
+.msg-err{margin-top:12px;padding:10px 14px;border-radius:10px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.4);color:#fca5a5}
+.msg-ok{margin-top:12px;padding:10px 14px;border-radius:10px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.4);color:#86efac}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid #2a2a44;vertical-align:middle}
+th{color:#9ca3af;font-size:11px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.table-wrap{overflow-x:auto;margin-top:14px}
+.badge{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700}
+.badge-green{background:rgba(52,211,153,.12);color:#86efac}
+.badge-red{background:rgba(239,68,68,.12);color:#fca5a5}
+.mono{font-family:ui-monospace,monospace;word-break:break-all;color:#93c5fd;font-size:11px}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.section-title{font-weight:700;color:white;font-size:15px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>OtakuSync Admin</h1>
+  <p class="sub">Subscription manager</p>
+
+  <!-- LOGIN -->
+  <div class="card" id="loginCard">
+    <div class="row">
+      <input type="password" id="pw" placeholder="Admin password" autocomplete="current-password"/>
+      <button class="btn-green" id="loginBtn" onclick="doLogin()">Login</button>
+    </div>
+    <div id="loginErr" class="msg-err hidden"></div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="app" class="hidden">
+
+    <!-- STATS -->
+    <div class="grid">
+      <div class="stat"><div class="num" id="sTotal">—</div><div class="lbl">Total Subs</div></div>
+      <div class="stat"><div class="num" id="sActive">—</div><div class="lbl">Active</div></div>
+      <div class="stat"><div class="num" id="sInactive">—</div><div class="lbl">Inactive</div></div>
+      <div class="stat"><div class="num" id="sSyncs">—</div><div class="lbl">Total Syncs</div></div>
+      <div class="stat"><div class="num" id="sEmails">—</div><div class="lbl">Email Records</div></div>
+    </div>
+
+    <!-- CREATE -->
+    <div class="card">
+      <div class="section-title" style="margin-bottom:12px">Create Subscriber</div>
+      <div class="row">
+        <input type="email" id="nEmail" placeholder="Email address"/>
+        <input type="text" id="nNote" placeholder="Note (optional)"/>
+        <button class="btn-green" onclick="doCreate()">Generate Link</button>
+      </div>
+      <div id="createMsg" class="msg-ok hidden"></div>
+    </div>
+
+    <!-- SUBSCRIBER TABLE -->
+    <div class="card">
+      <div class="row" style="align-items:center;margin-bottom:4px">
+        <div class="section-title">Subscribers</div>
+        <button class="btn-gray" onclick="doRefresh()">↻ Refresh</button>
+        <button class="btn-gray" onclick="doExport()">⬇ Export CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Note</th>
+              <th>Created</th>
+              <th>Last Sync</th>
+              <th>Syncs</th>
+              <th>Status</th>
+              <th>Master Feed URL</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="subTbl">
+            <tr><td colspan="8" style="color:#6b7280;padding:20px 8px">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+var PW = '';
+
+function doLogin() {
+  PW = document.getElementById('pw').value.trim();
+  var errEl = document.getElementById('loginErr');
+  errEl.classList.add('hidden');
+  if (!PW) { errEl.textContent = 'Enter your admin password.'; errEl.classList.remove('hidden'); return; }
+  document.getElementById('loginBtn').textContent = 'Checking...';
+  doRefresh()
+    .then(function() {
+      document.getElementById('loginCard').classList.add('hidden');
+      document.getElementById('app').classList.remove('hidden');
+    })
+    .catch(function(err) {
+      errEl.textContent = err.message || 'Login failed. Check your password.';
+      errEl.classList.remove('hidden');
+      document.getElementById('loginBtn').textContent = 'Login';
+    });
+}
+
+function callApi(path, opts) {
+  opts = opts || {};
+  return fetch(path, Object.assign({}, opts, {
+    headers: Object.assign({ 'Content-Type': 'application/json', 'X-Admin-Password': PW }, opts.headers || {})
+  })).then(function(r) {
+    var ct = r.headers.get('content-type') || '';
+    return (ct.includes('json') ? r.json() : r.text()).then(function(data) {
+      if (!r.ok) throw new Error((data && data.error) || ('HTTP ' + r.status));
+      return data;
+    });
+  });
+}
+
+function doRefresh() {
+  return Promise.all([
+    callApi('/admin/api/stats'),
+    callApi('/admin/api/subscribers')
+  ]).then(function(res) {
+    var s = res[0], subs = res[1].subscribers || [];
+    document.getElementById('sTotal').textContent = s.totalSubscribers || 0;
+    document.getElementById('sActive').textContent = s.activeSubscribers || 0;
+    document.getElementById('sInactive').textContent = s.inactiveSubscribers || 0;
+    document.getElementById('sSyncs').textContent = s.totalSyncs || 0;
+    document.getElementById('sEmails').textContent = s.totalEmails || 0;
+    renderSubs(subs);
+  });
+}
+
+function renderSubs(list) {
+  var tb = document.getElementById('subTbl');
+  if (!list.length) {
+    tb.innerHTML = '<tr><td colspan="8" style="color:#6b7280;padding:20px 8px">No subscribers yet.</td></tr>';
+    return;
+  }
+  tb.innerHTML = list.map(function(s) {
+    var url = location.origin + '/feed/' + s.token + '_master.ics';
+    var statusBadge = s.status === 'active'
+      ? '<span class="badge badge-green">active</span>'
+      : '<span class="badge badge-red">' + esc(s.status || 'inactive') + '</span>';
+    var toggleBtn = s.status === 'active'
+      ? '<button class="btn-sm btn-yellow" onclick="doStatus(\'' + s.token + '\',\'inactive\')">Pause</button>'
+      : '<button class="btn-sm btn-green" onclick="doStatus(\'' + s.token + '\',\'active\')">Activate</button>';
+    return '<tr>' +
+      '<td>' + esc(s.email || '') + '</td>' +
+      '<td>' + esc(s.note || '') + '</td>' +
+      '<td style="white-space:nowrap">' + esc((s.created || '').substring(0,10)) + '</td>' +
+      '<td style="white-space:nowrap">' + esc((s.lastSync || '—').substring(0,10)) + '</td>' +
+      '<td>' + (s.syncCount || 0) + '</td>' +
+      '<td>' + statusBadge + '</td>' +
+      '<td class="mono">' + esc(url) + '</td>' +
+      '<td><div class="actions">' +
+        '<button class="btn-sm btn-gray" onclick="doCopy(\'' + url + '\')">Copy</button>' +
+        toggleBtn +
+        '<button class="btn-sm btn-red" onclick="doDel(\'' + s.token + '\')">Delete</button>' +
+      '</div></td>' +
+    '</tr>';
+  }).join('');
+}
+
+function doCreate() {
+  var email = document.getElementById('nEmail').value.trim();
+  var note = document.getElementById('nNote').value.trim();
+  var msgEl = document.getElementById('createMsg');
+  msgEl.classList.add('hidden');
+  if (!email || !email.includes('@')) { msgEl.textContent = 'Enter a valid email.'; msgEl.className = 'msg-err'; msgEl.classList.remove('hidden'); return; }
+  callApi('/admin/api/subscribers', { method: 'POST', body: JSON.stringify({ email: email, note: note, feeds: ['master'] }) })
+    .then(function(d) {
+      var url = location.origin + '/feed/' + d.subscriber.token + '_master.ics';
+      msgEl.textContent = 'Created! Master feed: ' + url;
+      msgEl.className = 'msg-ok';
+      msgEl.classList.remove('hidden');
+      document.getElementById('nEmail').value = '';
+      document.getElementById('nNote').value = '';
+      doRefresh();
+    })
+    .catch(function(e) { msgEl.textContent = e.message || 'Error creating subscriber.'; msgEl.className = 'msg-err'; msgEl.classList.remove('hidden'); });
+}
+
+function doStatus(token, status) {
+  callApi('/admin/api/subscribers/' + encodeURIComponent(token), { method: 'PATCH', body: JSON.stringify({ status: status }) })
+    .then(doRefresh)
+    .catch(function(e) { alert(e.message || 'Update failed.'); });
+}
+
+function doDel(token) {
+  if (!confirm('Delete this subscriber? This cannot be undone.')) return;
+  callApi('/admin/api/subscribers/' + encodeURIComponent(token), { method: 'DELETE' })
+    .then(doRefresh)
+    .catch(function(e) { alert(e.message || 'Delete failed.'); });
+}
+
+function doExport() {
+  fetch('/admin/api/emails/export', { headers: { 'X-Admin-Password': PW } })
+    .then(function(r) { return r.blob(); })
+    .then(function(b) { var a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'otakusync-emails.csv'; a.click(); })
+    .catch(function() { alert('Export failed.'); });
+}
+
+function doCopy(text) {
+  navigator.clipboard.writeText(text)
+    .then(function() { alert('Copied to clipboard!'); })
+    .catch(function() { prompt('Copy this URL:', text); });
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+document.getElementById('pw').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doLogin();
+});
+</script>
+</body>
+</html>
