@@ -1,6 +1,7 @@
-const RAW_BASE = "https://raw.githubusercontent.com/otakusyncnet/calendar-feed/main";
-const ADMIN_PW = "3ZgQgmQrqYWn";
+var __defProp = Object.defineProperty;
+var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 
+const RAW_BASE = "https://raw.githubusercontent.com/otakusyncnet/calendar-feed/main";
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
@@ -10,32 +11,54 @@ const CORS = {
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: { ...CORS, "Content-Type": "application/json; charset=UTF-8" } });
 }
+__name(json, "json");
+
 function html(body, status = 200) {
   return new Response(body, { status, headers: { "Content-Type": "text/html; charset=UTF-8" } });
 }
-function normalizeEmail(email) { return String(email || "").trim().toLowerCase(); }
-function emailKey(email) { return "email:" + normalizeEmail(email).replace(/[^a-zA-Z0-9]/g, "_"); }
-function tokenKey(token) { return "token:" + token; }
-function subKey(token) { return "sub:" + token; }
+__name(html, "html");
+
+function normalizeEmail(e) { return String(e || "").trim().toLowerCase(); }
+__name(normalizeEmail, "normalizeEmail");
+
+function emailKey(e) { return "email:" + normalizeEmail(e).replace(/[^a-zA-Z0-9]/g, "_"); }
+__name(emailKey, "emailKey");
+
+function tokenKey(t) { return "token:" + t; }
+__name(tokenKey, "tokenKey");
+
+function subKey(t) { return "sub:" + t; }
+__name(subKey, "subKey");
+
 function makeToken() { return crypto.randomUUID().replace(/-/g, "").slice(0, 16); }
+__name(makeToken, "makeToken");
+
 function guessContentType(path) {
   if (path.endsWith(".html")) return "text/html; charset=UTF-8";
-  if (path.endsWith(".ics")) return "text/calendar; charset=UTF-8";
-  if (path.endsWith(".js")) return "application/javascript; charset=UTF-8";
-  if (path.endsWith(".css")) return "text/css; charset=UTF-8";
+  if (path.endsWith(".ics"))  return "text/calendar; charset=UTF-8";
+  if (path.endsWith(".js"))   return "application/javascript; charset=UTF-8";
+  if (path.endsWith(".css"))  return "text/css; charset=UTF-8";
   if (path.endsWith(".json")) return "application/json; charset=UTF-8";
-  if (path.endsWith(".png")) return "image/png";
-  if (path.endsWith(".svg")) return "image/svg+xml";
+  if (path.endsWith(".png"))  return "image/png";
+  if (path.endsWith(".svg"))  return "image/svg+xml";
   return "text/plain; charset=UTF-8";
 }
+__name(guessContentType, "guessContentType");
+
 async function fetchRaw(path) {
   return fetch(RAW_BASE + path, { headers: { "User-Agent": "OtakuSync-Worker" } });
 }
+__name(fetchRaw, "fetchRaw");
+
 async function proxyRawFile(path) {
   const resp = await fetchRaw(path);
   if (!resp.ok) return new Response("Not found", { status: 404 });
-  return new Response(await resp.text(), { status: 200, headers: { "Content-Type": guessContentType(path), "Cache-Control": "max-age=300" } });
+  return new Response(await resp.text(), {
+    status: 200,
+    headers: { "Content-Type": guessContentType(path), "Cache-Control": "max-age=60" },
+  });
 }
+__name(proxyRawFile, "proxyRawFile");
 
 export default {
   async fetch(request, env) {
@@ -43,7 +66,10 @@ export default {
     const path = url.pathname;
     try {
       if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
-      if (path === "/admin" || path === "/admin/") return html(ADMIN_HTML);
+
+      // Admin page — served from GitHub
+      if (path === "/admin" || path === "/admin/") return proxyRawFile("/admin.html");
+
       if (path.startsWith("/admin/api/")) return handleAdminAPI(request, env, path, url);
       if (path === "/api/signup" && request.method === "POST") return handleSignup(request, env, url);
       if (path.startsWith("/feed/") && path.endsWith(".ics")) return handleTokenFeed(request, env, url);
@@ -59,7 +85,7 @@ export default {
 };
 
 async function handleSignup(request, env, url) {
-  if (!env.ANIME_CAL) return json({ error: "KV binding ANIME_CAL is missing." }, 503);
+  if (!env.ANIME_CAL) return json({ error: "KV binding missing" }, 503);
   let body;
   try { body = await request.json(); } catch { return json({ error: "Invalid JSON" }, 400); }
   const email = normalizeEmail(body.email);
@@ -77,6 +103,7 @@ async function handleSignup(request, env, url) {
   await env.ANIME_CAL.put(subKey(token), JSON.stringify({ token, email, note: "Self-signup", feeds, created: now, status: "active", lastSync: null, syncCount: 0 }));
   return json({ success: true, existing: false, token, feeds });
 }
+__name(handleSignup, "handleSignup");
 
 async function handleTokenFeed(request, env, url) {
   if (!env.ANIME_CAL) return new Response("KV binding missing.", { status: 503 });
@@ -97,25 +124,31 @@ async function handleTokenFeed(request, env, url) {
   rec.lastSync = now; rec.syncCount = (rec.syncCount || 0) + 1;
   await env.ANIME_CAL.put(emailKey(mappedEmail), JSON.stringify(rec));
   const subRaw = await env.ANIME_CAL.get(subKey(token));
-  if (subRaw) { const sub = JSON.parse(subRaw); sub.lastSync = now; sub.syncCount = (sub.syncCount || 0) + 1; await env.ANIME_CAL.put(subKey(token), JSON.stringify(sub)); }
+  if (subRaw) {
+    const sub = JSON.parse(subRaw);
+    sub.lastSync = now; sub.syncCount = (sub.syncCount || 0) + 1;
+    await env.ANIME_CAL.put(subKey(token), JSON.stringify(sub));
+  }
   return new Response(await feedResp.text(), { status: 200, headers: { "Content-Type": "text/calendar; charset=UTF-8", "Cache-Control": "max-age=3600" } });
 }
+__name(handleTokenFeed, "handleTokenFeed");
 
 async function handleAdminAPI(request, env, path, url) {
-  if (!env.ANIME_CAL) return json({ error: "KV binding ANIME_CAL is missing." }, 503);
+  if (!env.ANIME_CAL) return json({ error: "KV binding missing" }, 503);
+  // Password comes from Cloudflare Secrets Store
+  if (!env.ADMIN_PASSWORD) return json({ error: "Admin password not configured" }, 503);
   const pw = request.headers.get("X-Admin-Password");
-  const expected = env.ADMIN_PASSWORD || ADMIN_PW;
-  if (pw !== expected) return json({ error: "Unauthorized" }, 401);
+  if (pw !== env.ADMIN_PASSWORD) return json({ error: "Unauthorized" }, 401);
 
   if (path === "/admin/api/stats" && request.method === "GET") {
     const [subsList, emailsList] = await Promise.all([env.ANIME_CAL.list({ prefix: "sub:" }), env.ANIME_CAL.list({ prefix: "email:" })]);
     const subs = (await Promise.all(subsList.keys.map(async k => { const v = await env.ANIME_CAL.get(k.name); return v ? JSON.parse(v) : null; }))).filter(Boolean);
-    return json({ totalSubscribers: subs.length, activeSubscribers: subs.filter(s=>s.status==="active").length, inactiveSubscribers: subs.filter(s=>s.status!=="active").length, totalSyncs: subs.reduce((a,s)=>a+(s.syncCount||0),0), totalEmails: emailsList.keys.length });
+    return json({ totalSubscribers: subs.length, activeSubscribers: subs.filter(s => s.status === "active").length, inactiveSubscribers: subs.filter(s => s.status !== "active").length, totalSyncs: subs.reduce((a, s) => a + (s.syncCount || 0), 0), totalEmails: emailsList.keys.length });
   }
   if (path === "/admin/api/subscribers" && request.method === "GET") {
     const list = await env.ANIME_CAL.list({ prefix: "sub:" });
     const subs = (await Promise.all(list.keys.map(async k => { const v = await env.ANIME_CAL.get(k.name); return v ? JSON.parse(v) : null; }))).filter(Boolean);
-    return json({ subscribers: subs.sort((a,b)=>String(b.created||"").localeCompare(String(a.created||""))) });
+    return json({ subscribers: subs.sort((a, b) => String(b.created || "").localeCompare(String(a.created || ""))) });
   }
   if (path === "/admin/api/subscribers" && request.method === "POST") {
     let body; try { body = await request.json(); } catch { return json({ error: "Bad JSON" }, 400); }
@@ -145,16 +178,15 @@ async function handleAdminAPI(request, env, path, url) {
   if (path === "/admin/api/emails" && request.method === "GET") {
     const list = await env.ANIME_CAL.list({ prefix: "email:" });
     const emails = (await Promise.all(list.keys.map(async k => { const v = await env.ANIME_CAL.get(k.name); return v ? JSON.parse(v) : null; }))).filter(Boolean);
-    return json({ emails: emails.sort((a,b)=>String(b.created||"").localeCompare(String(a.created||""))), count: emails.length });
+    return json({ emails: emails.sort((a, b) => String(b.created || "").localeCompare(String(a.created || ""))), count: emails.length });
   }
   if (path === "/admin/api/emails/export" && request.method === "GET") {
     const list = await env.ANIME_CAL.list({ prefix: "email:" });
     const emails = (await Promise.all(list.keys.map(async k => { const v = await env.ANIME_CAL.get(k.name); return v ? JSON.parse(v) : null; }))).filter(Boolean);
-    const rows = [["Email","Feeds","Created","Last Sync","Sync Count","Status","Token"],...emails.map(e=>[e.email||"",(e.feeds||[]).join("|"),e.created||"",e.lastSync||"",e.syncCount||0,e.status||"",e.token||""])];
-    const csv = rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")).join("\n");
+    const rows = [["Email","Feeds","Created","Last Sync","Sync Count","Status","Token"], ...emails.map(e => [e.email||"",(e.feeds||[]).join("|"),e.created||"",e.lastSync||"",e.syncCount||0,e.status||"",e.token||""])];
+    const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(",")).join("\n");
     return new Response(csv, { status: 200, headers: { ...CORS, "Content-Type": "text/csv; charset=UTF-8", "Content-Disposition": 'attachment; filename="otakusync-emails.csv"' } });
   }
   return json({ error: "Not found" }, 404);
 }
-
-const ADMIN_HTML = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>OtakuSync Admin</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0d0d1a;color:#e5e7eb;min-height:100vh}.wrap{max-width:1100px;margin:0 auto;padding:24px}.header{margin-bottom:20px}.header h1{font-size:28px;color:white}.header p{color:#9ca3af;margin-top:6px}.card{background:#17172a;border:1px solid #2a2a44;border-radius:16px;padding:20px;margin-bottom:18px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:18px}.stat{background:#111122;border:1px solid #2a2a44;border-radius:14px;padding:18px;text-align:center}.stat .num{font-size:32px;font-weight:800;color:#34d399}.stat .label{margin-top:6px;color:#9ca3af;font-size:12px;text-transform:uppercase;letter-spacing:.05em}input,button{font:inherit}input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #374151;background:#0b1020;color:white}.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:180px}button{padding:12px 16px;border:0;border-radius:10px;cursor:pointer;font-weight:700}.btn-primary{background:#34d399;color:#08110f}.btn-danger{background:#ef4444;color:white}.btn-muted{background:#374151;color:white}.btn-warn{background:#f59e0b;color:black}.small-btn{padding:8px 10px;border-radius:8px;font-size:12px}.hidden{display:none}.error{margin-top:12px;padding:10px 12px;border-radius:10px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.4);color:#fca5a5}.success{margin-top:12px;padding:10px 12px;border-radius:10px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.4);color:#86efac}table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:10px;border-bottom:1px solid #2a2a44;vertical-align:top}th{color:#9ca3af;font-size:11px;text-transform:uppercase;letter-spacing:.05em}.table-wrap{overflow-x:auto}.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700}.active{background:rgba(52,211,153,.12);color:#86efac}.inactive{background:rgba(239,68,68,.12);color:#fca5a5}.mono{font-family:ui-monospace,monospace;word-break:break-all;color:#93c5fd}</style></head><body><div class="wrap"><div class="header"><h1>OtakuSync Admin</h1><p>Subscription manager</p></div><div class="card" id="loginCard"><div class="row"><input type="password" id="pw" placeholder="Admin password" autocomplete="current-password"/><button class="btn-primary" onclick="login()">Login</button></div><div id="loginError" class="error hidden"></div></div><div id="app" class="hidden"><div class="grid"><div class="stat"><div class="num" id="sTotal">0</div><div class="label">Total Subs</div></div><div class="stat"><div class="num" id="sActive">0</div><div class="label">Active</div></div><div class="stat"><div class="num" id="sInactive">0</div><div class="label">Inactive</div></div><div class="stat"><div class="num" id="sSyncs">0</div><div class="label">Total Syncs</div></div><div class="stat"><div class="num" id="sEmails">0</div><div class="label">Email Records</div></div></div><div class="card"><h2 style="margin-bottom:12px;">Create Subscriber</h2><div class="row"><input type="email" id="newEmail" placeholder="Email"/><input type="text" id="newNote" placeholder="Note"/><button class="btn-primary" onclick="createSubscriber()">Generate Link</button></div><div id="createResult" class="success hidden"></div></div><div class="card"><div class="row" style="align-items:center;"><div style="font-weight:700;">Subscribers</div><button class="btn-muted" onclick="refreshAll()">Refresh</button><button class="btn-muted" onclick="exportEmails()">Export CSV</button></div><div class="table-wrap" style="margin-top:14px;"><table><thead><tr><th>Email</th><th>Note</th><th>Created</th><th>Last Sync</th><th>Syncs</th><th>Status</th><th>Master Feed</th><th>Actions</th></tr></thead><tbody id="subTable"><tr><td colspan="8">No data yet.</td></tr></tbody></table></div></div></div></div><script>var PW="";function setLoginError(msg){var el=document.getElementById("loginError");el.textContent=msg;el.classList.remove("hidden");}function clearLoginError(){document.getElementById("loginError").classList.add("hidden");}async function api(path,options){options=options||{};var res=await fetch(path,Object.assign({},options,{headers:Object.assign({"Content-Type":"application/json","X-Admin-Password":PW},options.headers||{})}));var ct=res.headers.get("content-type")||"";var data=ct.includes("application/json")?await res.json():await res.text();if(!res.ok)throw new Error((data&&data.error)||"Request failed");return data;}async function login(){PW=document.getElementById("pw").value.trim();clearLoginError();if(!PW){setLoginError("Enter your admin password.");return;}try{await refreshAll();document.getElementById("loginCard").classList.add("hidden");document.getElementById("app").classList.remove("hidden");}catch(err){setLoginError(err.message||"Login failed.");}}async function refreshAll(){var results=await Promise.all([api("/admin/api/stats"),api("/admin/api/subscribers")]);var stats=results[0];var subs=results[1];document.getElementById("sTotal").textContent=stats.totalSubscribers||0;document.getElementById("sActive").textContent=stats.activeSubscribers||0;document.getElementById("sInactive").textContent=stats.inactiveSubscribers||0;document.getElementById("sSyncs").textContent=stats.totalSyncs||0;document.getElementById("sEmails").textContent=stats.totalEmails||0;renderSubscribers(subs.subscribers||[]);}function renderSubscribers(subscribers){var tbody=document.getElementById("subTable");if(!subscribers.length){tbody.innerHTML="<tr><td colspan=8>No subscribers found.</td></tr>";return;}tbody.innerHTML=subscribers.map(function(sub){var status=sub.status==="active"?"active":"inactive";var masterUrl=location.origin+"/feed/"+sub.token+"_master.ics";var pauseBtn=sub.status==="active"?"<button class=small-btn onclick=\"setStatus(\'"+sub.token+"\',\'inactive\')\">Pause</button>":"<button class=small-btn onclick=\"setStatus(\'"+sub.token+"\',\'active\')\">Activate</button>";return "<tr><td>"+escapeHtml(sub.email||"")+"</td><td>"+escapeHtml(sub.note||"")+"</td><td>"+escapeHtml(sub.created||"")+"</td><td>"+escapeHtml(sub.lastSync||"")+"</td><td>"+(sub.syncCount||0)+"</td><td><span class=\"badge "+status+"\">"+escapeHtml(sub.status||"inactive")+"</span></td><td class=mono>"+escapeHtml(masterUrl)+"</td><td><div style=display:flex;gap:6px><button class=\"small-btn btn-muted\" onclick=\"copyText(\'"+masterUrl+"\')\">Copy</button>"+pauseBtn+"<button class=\"small-btn btn-danger\" onclick=\"deleteSub(\'"+sub.token+"\')\">Delete</button></div></td></tr>";}).join("");}async function createSubscriber(){var email=document.getElementById("newEmail").value.trim();var note=document.getElementById("newNote").value.trim();var result=document.getElementById("createResult");result.className="success hidden";result.textContent="";try{var data=await api("/admin/api/subscribers",{method:"POST",body:JSON.stringify({email:email,note:note,feeds:["master"]})});var feedUrl=location.origin+"/feed/"+data.subscriber.token+"_master.ics";result.textContent="Created. Feed: "+feedUrl;result.className="success";result.classList.remove("hidden");document.getElementById("newEmail").value="";document.getElementById("newNote").value="";await refreshAll();}catch(err){result.textContent=err.message||"Error";result.className="error";result.classList.remove("hidden");}}async function setStatus(token,status){try{await api("/admin/api/subscribers/"+encodeURIComponent(token),{method:"PATCH",body:JSON.stringify({status:status})});await refreshAll();}catch(err){alert(err.message);}}async function deleteSub(token){if(!confirm("Delete?"))return;try{await api("/admin/api/subscribers/"+encodeURIComponent(token),{method:"DELETE"});await refreshAll();}catch(err){alert(err.message);}}async function exportEmails(){var res=await fetch("/admin/api/emails/export",{headers:{"X-Admin-Password":PW}});if(!res.ok){alert("Export failed.");return;}var blob=await res.blob();var dlUrl=URL.createObjectURL(blob);var a=document.createElement("a");a.href=dlUrl;a.download="otakusync-emails.csv";a.click();URL.revokeObjectURL(dlUrl);}async function copyText(text){try{await navigator.clipboard.writeText(text);alert("Copied");}catch(e){alert("Copy failed");}}function escapeHtml(str){return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}document.getElementById("pw").addEventListener("keydown",function(e){if(e.key==="Enter")login();});</script></body></html>';
+__name(handleAdminAPI, "handleAdminAPI");
