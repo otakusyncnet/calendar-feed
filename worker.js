@@ -107,28 +107,62 @@ __name(handleSignup, "handleSignup");
 
 async function handleTokenFeed(request, env, url) {
   if (!env.ANIME_CAL) return new Response("KV binding missing.", { status: 503 });
+
   const filename = url.pathname.split("/").pop();
-  const parts = filename.replace(/\.ics$/i, "").split("_");
-  if (parts.length < 2) return new Response("Invalid feed link.", { status: 400 });
+  const base = filename.replace(".ics", "");
+  const parts = base.split("_");
+
   const token = parts[0];
-  const feedName = ["master","crunchyroll","netflix","hidive","manga","manhwa","manhua"].includes(parts.slice(1).join("_")) ? parts.slice(1).join("_") : "master";
-  const mappedEmail = await env.ANIME_CAL.get(tokenKey(token));
-  if (!mappedEmail) return new Response("Invalid subscription link.", { status: 403 });
-  const recRaw = await env.ANIME_CAL.get(emailKey(mappedEmail));
-  if (!recRaw) return new Response("Subscription not found.", { status: 403 });
-  const rec = JSON.parse(recRaw);
-  if (rec.status && rec.status !== "active") return new Response("Subscription deactivated.", { status: 403 });
-  const feedResp = await fetchRaw("/feeds/" + feedName + ".ics");
-  if (!feedResp.ok) return new Response("Calendar unavailable.", { status: 503 });
-  const now = new Date().toISOString();
-  rec.lastSync = now; rec.syncCount = (rec.syncCount || 0) + 1;
-  await env.ANIME_CAL.put(emailKey(mappedEmail), JSON.stringify(rec));
+
+  const requestedFeed = parts.slice(1).join("_");
+  const validFeeds = [
+    "master",
+    "crunchyroll",
+    "netflix",
+    "hidive",
+    "hulu",
+    "disney",
+    "amazon",
+    "youtube",
+    "bilibili",
+    "manga",
+    "manhwa",
+    "manhua"
+  ];
+
+  const feedName = validFeeds.includes(requestedFeed) ? requestedFeed : "master";
+
+  const email = await env.ANIME_CAL.get(tokenKey(token));
+  if (!email) return new Response("Invalid or expired feed token.", { status: 403 });
+
   const subRaw = await env.ANIME_CAL.get(subKey(token));
-  if (subRaw) {
-    const sub = JSON.parse(subRaw);
-    sub.lastSync = now; sub.syncCount = (sub.syncCount || 0) + 1;
-    await env.ANIME_CAL.put(subKey(token), JSON.stringify(sub));
+  if (!subRaw) return new Response("Subscriber not found.", { status: 404 });
+
+  const sub = JSON.parse(subRaw);
+
+  if (sub.status && sub.status !== "active") {
+    return new Response("This subscription is inactive.", { status: 403 });
   }
+
+  const now = new Date().toISOString();
+
+  sub.lastSync = now;
+  sub.syncCount = Number(sub.syncCount || 0) + 1;
+  sub.lastFeed = feedName;
+
+  await env.ANIME_CAL.put(subKey(token), JSON.stringify(sub));
+
+  const emailRaw = await env.ANIME_CAL.get(emailKey(email));
+  if (emailRaw) {
+    const emailRecord = JSON.parse(emailRaw);
+    emailRecord.lastSync = now;
+    emailRecord.syncCount = Number(emailRecord.syncCount || 0) + 1;
+    emailRecord.lastFeed = feedName;
+    await env.ANIME_CAL.put(emailKey(email), JSON.stringify(emailRecord));
+  }
+
+  return proxyRawFile("/feeds/" + feedName + ".ics");
+}
   return new Response(await feedResp.text(), { status: 200, headers: { "Content-Type": "text/calendar; charset=UTF-8", "Cache-Control": "max-age=3600" } });
 }
 __name(handleTokenFeed, "handleTokenFeed");
