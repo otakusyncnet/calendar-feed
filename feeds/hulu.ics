@@ -1,0 +1,68 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Otakusync//Anime Calendar//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:OtakuSync – Hulu
+X-WR-TIMEZONE:UTC
+BEGIN:VEVENT
+UID:196012-weekly@otakusync
+DTSTAMP:20260626T013752Z
+DTSTART:20260627T144600Z
+DTEND:20260627T151600Z
+SUMMARY:MAO - Episode 13 [Hulu\, Disney+\, Amazon Prime Video\, YouTube\, B
+ ilibili]
+DESCRIPTION:Title: MAO\nFormat: TV\nStatus: Releasing\nFrequency: Weekly\nD
+ ub/Sub: Sub\nWeekly Day: Saturday\nStarting Episode: 13\nNext Airing (ET): 
+ Saturday\, Jun 27\, 2026 10:46 AM EDT\nGenres: Drama\, Mystery\, Romance\, 
+ Supernatural\, Historical\, Mythology\, Time Travel\, Shounen\nTags: ðŸŽ­ ð
+ Ÿ•µï¸ ðŸ’˜ ðŸ”®\nPlatforms: Hulu\, Disney+\, Amazon Prime Video\, YouTube\
+ , Bilibili\nPlatform Links: https://www.hulu.com/series/mao-7c9b966e-4234-4
+ 994-b1ef-37242b834d72\, https://www.disneyplus.com/pt-br/browse/entity-6b61
+ 16ca-6f0b-4748-bb8d-b0fbb8eb5119\, https://www.bilibili.tv/en/media/2343716
+ \, https://www.youtube.com/playlist?list=PLxSscENEp7Jh6jFqpP-B97p7eUzipzZzv
+ \, https://www.amazon.co.jp/gp/video/detail/amzn1.dv.gti.216799c0-8263-4bc4
+ -b95a-d91f002591c8\, https://www.b-ch.com/titles/9635/\nAniList: https://an
+ ilist.co/anime/196012\nDescription: A curse that binds past and present. Ma
+ o\, a young mystic who lives in the Taisho period of early...
+LOCATION:Hulu\, Disney+\, Amazon Prime Video\, YouTube\, Bilibili
+URL:https://anilist.co/anime/196012
+CATEGORIES:TV,Hulu,Disney+,Amazon Prime Video,YouTube,Bilibili,Drama,Myster
+ y,Romance,Supernatural,Historical,Mythology,Time Travel,Shounen
+RRULE:FREQ=WEEKLY;BYDAY=SA;COUNT=14
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Anime reminder
+TRIGGER:-PT10M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:182578-weekly@otakusync
+DTSTAMP:20260626T013752Z
+DTSTART:20260628T080000Z
+DTEND:20260628T083000Z
+SUMMARY:Mission: Yozakura Family Season 2 - Episode 12 [Hulu\, Disney+]
+DESCRIPTION:Title: Mission: Yozakura Family Season 2\nFormat: TV\nStatus: R
+ eleasing\nFrequency: Weekly\nDub/Sub: Sub\nWeekly Day: Sunday\nStarting Epi
+ sode: 12\nNext Airing (ET): Sunday\, Jun 28\, 2026 4:00 AM EDT\nGenres: Act
+ ion\, Comedy\, Romance\, Shounen\nTags: âš”ï¸ ðŸ˜‚ ðŸ’˜\nPlatforms: Hulu\,
+  Disney+\nPlatform Links: https://www.disneyplus.com/browse/entity-ac689bea
+ -f955-4d95-8693-7b87b5a309cb\, https://www.hulu.com/series/mission-yozakura
+ -family-ac689bea-f955-4d95-8693-7b87b5a309cb\nAniList: https://anilist.co/a
+ nime/182578\nDescription: The second season of Yozakura-san Chi no Daisakus
+ en .
+LOCATION:Hulu\, Disney+
+URL:https://anilist.co/anime/182578
+CATEGORIES:TV,Hulu,Disney+,Action,Comedy,Romance,Shounen
+RRULE:FREQ=WEEKLY;BYDAY=SU;COUNT=1
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Anime reminder
+TRIGGER:-PT10M
+END:VALARM
+END:VEVENT
+END:VCALENDAR

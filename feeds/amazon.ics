@@ -1,0 +1,69 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Otakusync//Anime Calendar//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:OtakuSync – Amazon Prime Video
+X-WR-TIMEZONE:UTC
+BEGIN:VEVENT
+UID:196012-weekly@otakusync
+DTSTAMP:20260626T013752Z
+DTSTART:20260627T144600Z
+DTEND:20260627T151600Z
+SUMMARY:MAO - Episode 13 [Hulu\, Disney+\, Amazon Prime Video\, YouTube\, B
+ ilibili]
+DESCRIPTION:Title: MAO\nFormat: TV\nStatus: Releasing\nFrequency: Weekly\nD
+ ub/Sub: Sub\nWeekly Day: Saturday\nStarting Episode: 13\nNext Airing (ET): 
+ Saturday\, Jun 27\, 2026 10:46 AM EDT\nGenres: Drama\, Mystery\, Romance\, 
+ Supernatural\, Historical\, Mythology\, Time Travel\, Shounen\nTags: ðŸŽ­ ð
+ Ÿ•µï¸ ðŸ’˜ ðŸ”®\nPlatforms: Hulu\, Disney+\, Amazon Prime Video\, YouTube\
+ , Bilibili\nPlatform Links: https://www.hulu.com/series/mao-7c9b966e-4234-4
+ 994-b1ef-37242b834d72\, https://www.disneyplus.com/pt-br/browse/entity-6b61
+ 16ca-6f0b-4748-bb8d-b0fbb8eb5119\, https://www.bilibili.tv/en/media/2343716
+ \, https://www.youtube.com/playlist?list=PLxSscENEp7Jh6jFqpP-B97p7eUzipzZzv
+ \, https://www.amazon.co.jp/gp/video/detail/amzn1.dv.gti.216799c0-8263-4bc4
+ -b95a-d91f002591c8\, https://www.b-ch.com/titles/9635/\nAniList: https://an
+ ilist.co/anime/196012\nDescription: A curse that binds past and present. Ma
+ o\, a young mystic who lives in the Taisho period of early...
+LOCATION:Hulu\, Disney+\, Amazon Prime Video\, YouTube\, Bilibili
+URL:https://anilist.co/anime/196012
+CATEGORIES:TV,Hulu,Disney+,Amazon Prime Video,YouTube,Bilibili,Drama,Myster
+ y,Romance,Supernatural,Historical,Mythology,Time Travel,Shounen
+RRULE:FREQ=WEEKLY;BYDAY=SA;COUNT=14
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Anime reminder
+TRIGGER:-PT10M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:169228-weekly@otakusync
+DTSTAMP:20260626T013752Z
+DTSTART:20260626T160000Z
+DTEND:20260626T163000Z
+SUMMARY:FIST OF THE NORTH STAR: HOKUTO NO KEN - Episode 14 [Amazon Prime Vi
+ deo]
+DESCRIPTION:Title: FIST OF THE NORTH STAR: HOKUTO NO KEN\nFormat: TV\nStatu
+ s: Releasing\nFrequency: Weekly\nDub/Sub: Sub\nWeekly Day: Friday\nStarting
+  Episode: 14\nNext Airing (ET): Friday\, Jun 26\, 2026 12:00 PM EDT\nGenres
+ : Action\, Drama\, Sci-Fi\, Gore\, Martial Arts\, Shounen\nTags: âš”ï¸ ðŸŽ
+ ­ ðŸš€\nPlatforms: Amazon Prime Video\nPlatform Links: https://www.amazon.c
+ o.jp/dp/B0G4BLNYJJ\nAniList: https://anilist.co/anime/169228\nDescription: 
+ In the year 199X\, the world is engulfed in a nuclear inferno! The seas hav
+ e vanished. The earth l...
+LOCATION:Amazon Prime Video
+URL:https://anilist.co/anime/169228
+CATEGORIES:TV,Amazon Prime Video,Action,Drama,Sci-Fi,Gore,Martial Arts,Shou
+ nen
+RRULE:FREQ=WEEKLY;BYDAY=FR;COUNT=1
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Anime reminder
+TRIGGER:-PT10M
+END:VALARM
+END:VEVENT
+END:VCALENDAR
