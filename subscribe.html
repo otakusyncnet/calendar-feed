@@ -1,241 +1,267 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Subscribe — OtakuSync</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Rajdhani',sans-serif;background:#04040f;color:#f0f0f0;min-height:100vh}
-nav{padding:20px 40px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.07)}
-.brand{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.12em;color:#fff;text-decoration:none}
-.brand span{color:#00d4aa}
-.back{color:rgba(255,255,255,.5);text-decoration:none;font-size:15px;font-weight:600}
-.back:hover{color:#fff}
-.wrap{max-width:640px;margin:0 auto;padding:56px 24px 80px}
-
-/* steps */
-.steps{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:48px}
-.s{display:flex;align-items:center;gap:8px}
-.s-num{width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,255,255,.15);color:rgba(255,255,255,.3);font-family:'Bebas Neue',sans-serif;font-size:17px;display:flex;align-items:center;justify-content:center;transition:all .3s}
-.s-num.on{border-color:#00d4aa;color:#00d4aa;background:rgba(0,212,170,.1)}
-.s-num.done{border-color:#00d4aa;background:#00d4aa;color:#04040f}
-.s-lbl{font-size:13px;font-weight:700;letter-spacing:.06em;color:rgba(255,255,255,.3);transition:color .3s}
-.s-lbl.on{color:#fff}
-.line{width:48px;height:1px;background:rgba(255,255,255,.1);margin:0 6px}
-
-/* cards */
-.card{background:#080820;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:40px}
-.card.gone{display:none}
-.card h2{font-family:'Bebas Neue',sans-serif;font-size:44px;color:#fff;line-height:1;margin-bottom:8px}
-.card p{font-size:16px;color:rgba(255,255,255,.55);line-height:1.65;margin-bottom:28px}
-
-/* email step */
-.erow{display:flex;gap:10px}
-.einput{flex:1;padding:14px 18px;background:#04040f;border:1.5px solid rgba(255,255,255,.1);border-radius:8px;color:#f0f0f0;font-size:16px;font-family:'Rajdhani',sans-serif;font-weight:600;transition:border-color .2s}
-.einput:focus{outline:none;border-color:#00d4aa}
-.einput.err{border-color:#e84040}
-.ebtn{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.08em;padding:14px 28px;background:#00d4aa;color:#04040f;border:none;border-radius:8px;cursor:pointer;white-space:nowrap;transition:opacity .15s}
-.ebtn:hover{opacity:.85}
-.ebtn:disabled{opacity:.45;cursor:not-allowed}
-.errmsg{font-size:13px;color:#e84040;margin-top:8px;min-height:18px}
-.fnote{font-size:12px;color:rgba(255,255,255,.25);margin-top:10px}
-
-/* feed picker */
-.modegrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
-.mcard{background:#0d0d2b;border:2px solid rgba(255,255,255,.08);border-radius:12px;padding:24px 20px;cursor:pointer;transition:border-color .2s,background .2s;position:relative;user-select:none}
-.mcard:hover{background:rgba(255,255,255,.02)}
-.mcard.sel{border-color:#00d4aa;background:rgba(0,212,170,.06)}
-.mcard.sel::after{content:'✓';position:absolute;top:12px;right:14px;width:22px;height:22px;border-radius:50%;background:#00d4aa;color:#04040f;font-weight:800;font-size:12px;display:grid;place-items:center}
-.micon{font-size:26px;margin-bottom:10px}
-.mname{font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;margin-bottom:4px}
-.mdesc{font-size:13px;color:rgba(255,255,255,.45);line-height:1.5}
-.mbadge{display:inline-block;margin-top:8px;font-size:11px;letter-spacing:.08em;font-weight:700;padding:3px 8px;border-radius:2px;background:rgba(0,212,170,.12);color:#00d4aa;border:1px solid rgba(0,212,170,.25)}
-
-/* platform grid */
-.psec{display:none;margin-bottom:20px}
-.psec.show{display:block}
-.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-@media(max-width:480px){.pgrid{grid-template-columns:1fr 1fr}.modegrid{grid-template-columns:1fr}}
-.pcard{background:#0d0d2b;border:2px solid rgba(255,255,255,.08);border-radius:10px;padding:16px 14px;cursor:pointer;transition:border-color .2s;position:relative;user-select:none}
-.pcard:hover{background:rgba(255,255,255,.02)}
-.pcard.sel{border-color:#00d4aa}
-.pcard.sel::after{content:'✓';position:absolute;top:8px;right:10px;width:18px;height:18px;border-radius:50%;background:#00d4aa;color:#04040f;font-weight:800;font-size:10px;display:grid;place-items:center}
-.pdot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-bottom:8px}
-.pname{font-family:'Bebas Neue',sans-serif;font-size:19px;color:#fff;margin-bottom:2px}
-.psub{font-size:11px;color:rgba(255,255,255,.4)}
-.pdiv{height:1px;background:rgba(255,255,255,.07);margin:20px 0}
-
-.getbtn{display:block;width:100%;font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.1em;padding:18px;background:#e84040;color:#fff;border:none;border-radius:8px;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 0 40px rgba(232,64,64,.25)}
-.getbtn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 4px 60px rgba(232,64,64,.45)}
-.getbtn:disabled{opacity:.4;cursor:not-allowed;transform:none}
-.getnote{text-align:center;font-size:12px;color:rgba(255,255,255,.25);margin-top:10px}
-
-.spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite;vertical-align:middle;margin-right:6px}
-@keyframes sp{to{transform:rotate(360deg)}}
-</style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Subscribe — OtakuSync Spring 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--red:#e84040;--gold:#f5c842;--teal:#00d4aa;--purple:#9b5de5;--dark:#04040f;--dark2:#080820;--dark3:#0d0d2b;--border:rgba(255,255,255,0.08);}
+    body{font-family:'Rajdhani',sans-serif;background:var(--dark);color:#f0f0f0;min-height:100vh;}
+    nav{padding:20px 40px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);}
+    .nav-brand{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.12em;color:#fff;text-decoration:none;}
+    .nav-brand span{color:var(--teal);}
+    .nav-back{color:rgba(240,240,240,.6);text-decoration:none;font-size:15px;font-weight:500;}
+    .nav-back:hover{color:#fff;}
+    .hero{text-align:center;padding:60px 24px 40px;}
+    .hero-tag{display:inline-block;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.35em;color:var(--teal);border:1px solid rgba(0,212,170,.4);padding:6px 18px;border-radius:2px;margin-bottom:20px;}
+    .hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8vw,88px);line-height:1;color:#fff;margin-bottom:12px;}
+    .hero p{font-size:18px;color:rgba(240,240,240,.6);max-width:560px;margin:0 auto;}
+    .main{max-width:920px;margin:0 auto;padding:0 24px 80px;}
+    .step-label{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.3em;color:var(--gold);margin-bottom:16px;margin-top:40px;}
+    .option-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:8px;}
+    @media(max-width:600px){.option-grid{grid-template-columns:1fr;}}
+    .option-card{background:var(--dark2);border:2px solid var(--border);border-radius:12px;padding:28px 24px;cursor:pointer;transition:border-color .2s,background .2s;position:relative;user-select:none;}
+    .option-card:hover{background:var(--dark3);}
+    .option-card.selected{border-color:var(--teal);}
+    .option-card.selected::after{content:'✓';position:absolute;top:14px;right:16px;width:24px;height:24px;border-radius:50%;background:var(--teal);color:#04040f;font-weight:800;font-size:13px;display:grid;place-items:center;}
+    .option-icon{font-size:28px;margin-bottom:12px;}
+    .option-name{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.05em;color:#fff;margin-bottom:6px;}
+    .option-desc{font-size:14px;color:rgba(240,240,240,.55);line-height:1.5;}
+    .option-badge{display:inline-block;margin-top:10px;font-size:12px;letter-spacing:.1em;padding:4px 10px;border-radius:2px;font-weight:600;}
+    .platform-section{display:none;margin-top:8px;}
+    .platform-section.active{display:block;}
+    .plat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:32px;}
+    .plat-card{background:var(--dark2);border:2px solid var(--border);border-radius:10px;padding:20px 18px;cursor:pointer;transition:border-color .2s,background .2s;position:relative;}
+    .plat-card:hover{background:var(--dark3);}
+    .plat-card.selected{border-color:var(--teal);}
+    .plat-card.selected::after{content:'✓';position:absolute;top:10px;right:12px;width:20px;height:20px;border-radius:50%;background:var(--teal);color:#04040f;font-weight:800;font-size:11px;display:grid;place-items:center;}
+    .plat-dot{width:12px;height:12px;border-radius:50%;display:inline-block;margin-bottom:10px;}
+    .plat-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.05em;color:#fff;margin-bottom:4px;}
+    .plat-sub{font-size:12px;color:rgba(240,240,240,.5);}
+    .divider{height:1px;background:var(--border);margin:40px 0;}
+    .cta-wrap{text-align:center;margin-top:32px;}
+    .btn-get{display:inline-flex;align-items:center;gap:10px;background:var(--red);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.1em;padding:18px 52px;border-radius:3px;border:none;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 0 40px rgba(232,64,64,.35);text-decoration:none;}
+    .btn-get:hover{transform:translateY(-2px);box-shadow:0 4px 60px rgba(232,64,64,.5);}
+    .cta-note{margin-top:14px;font-size:13px;color:rgba(240,240,240,.35);}
+    /* Feed result box */
+    .result-box{display:none;background:var(--dark2);border:1px solid rgba(0,212,170,.3);border-radius:12px;padding:32px;margin-top:40px;}
+    .result-box.show{display:block;}
+    .result-box h2{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--teal);margin-bottom:8px;}
+    .result-box p{font-size:15px;color:rgba(240,240,240,.6);margin-bottom:24px;}
+    .feed-item{background:#04040f;border:1px solid var(--border);border-radius:8px;padding:16px 18px;margin-bottom:12px;}
+    .feed-item-name{font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+    .feed-url{font-family:monospace;font-size:12px;color:var(--teal);word-break:break-all;background:rgba(0,212,170,.06);padding:8px 10px;border-radius:4px;margin-bottom:10px;}
+    .feed-btns{display:flex;gap:8px;flex-wrap:wrap;}
+    .fbtn{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:.08em;padding:8px 18px;border-radius:3px;border:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s;}
+    .fbtn:hover{opacity:.85;}
+    .fbtn-apple{background:#1c1c1e;color:#fff;border:1px solid #3a3a3c;}
+    .fbtn-copy{background:var(--red);color:#fff;}
+    /* Color guide */
+    .guide-box{background:var(--dark2);border:1px solid var(--border);border-radius:12px;padding:32px;margin-top:48px;}
+    .guide-box h2{font-family:'Bebas Neue',sans-serif;font-size:32px;color:#fff;margin-bottom:6px;}
+    .guide-box p{font-size:15px;color:rgba(240,240,240,.55);margin-bottom:24px;line-height:1.6;}
+    .guide-tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+    .gtab{padding:8px 20px;border-radius:2px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.05em;cursor:pointer;border:1px solid var(--border);background:transparent;color:rgba(240,240,240,.55);transition:all .15s;}
+    .gtab.active{background:var(--dark3);border-color:rgba(255,255,255,.25);color:#fff;}
+    .gcontent{display:none;}
+    .gcontent.active{display:block;}
+    .gsteps{display:flex;flex-direction:column;gap:14px;}
+    .gstep{display:flex;gap:14px;align-items:flex-start;}
+    .gnum{min-width:28px;height:28px;border-radius:50%;background:rgba(232,64,64,.2);border:1px solid rgba(232,64,64,.4);color:var(--red);font-weight:700;font-size:13px;display:grid;place-items:center;}
+    .gtext{font-size:15px;color:rgba(240,240,240,.75);line-height:1.5;padding-top:4px;}
+    .gtext strong{color:#fff;}
+    #toast{position:fixed;bottom:20px;right:20px;background:var(--teal);color:#04040f;font-weight:700;padding:12px 20px;border-radius:8px;font-size:14px;display:none;z-index:999;}
+  </style>
 </head>
 <body>
 <nav>
-  <a class="brand" href="/">OTAKU<span>SYNC</span></a>
-  <a class="back" href="/">← Home</a>
+  <a class="nav-brand" href="/">OTAKU<span>SYNC</span></a>
+  <a class="nav-back" href="/">← Back to Home</a>
 </nav>
-<div class="wrap">
-
-  <div class="steps">
-    <div class="s"><div class="s-num on" id="n1">1</div><div class="s-lbl on" id="l1">Your Email</div></div>
-    <div class="line"></div>
-    <div class="s"><div class="s-num" id="n2">2</div><div class="s-lbl" id="l2">Pick Feeds</div></div>
-    <div class="line"></div>
-    <div class="s"><div class="s-num" id="n3">3</div><div class="s-lbl" id="l3">Get Links</div></div>
-  </div>
-
-  <!-- STEP 1: EMAIL -->
-  <div class="card" id="c1">
-    <h2>Get Your Feed</h2>
-    <p>Enter your email to generate your personal calendar link. We use it to send you Summer 2026 updates — no spam, ever.</p>
-    <div class="erow">
-      <input class="einput" id="ei" type="email" placeholder="your@email.com" autocomplete="email"/>
-      <button class="ebtn" id="eb" onclick="goStep2()">Next →</button>
-    </div>
-    <div class="errmsg" id="em"></div>
-    <div class="fnote">By continuing you agree to receive OtakuSync seasonal updates. Unsubscribe anytime.</div>
-  </div>
-
-  <!-- STEP 2: FEED PICKER -->
-  <div class="card gone" id="c2">
-    <h2>Build Your Feed</h2>
-    <p>One feed for everything, or separate color-coded feeds per platform. Subscribe once — auto-updates forever.</p>
-
-    <div class="modegrid">
-      <div class="mcard" id="mc-master" onclick="pick('master')">
-        <div class="micon">⚡</div>
-        <div class="mname">Everything</div>
-        <div class="mdesc">All anime, manga, manhwa & manhua. All platforms in one feed.</div>
-        <div class="mbadge">611 events · Simplest option</div>
-      </div>
-      <div class="mcard" id="mc-custom" onclick="pick('custom')">
-        <div class="micon">🎛️</div>
-        <div class="mname">Pick My Feeds</div>
-        <div class="mdesc">Choose platforms. Each becomes a separate color-coded calendar.</div>
-        <div class="mbadge" style="background:rgba(245,200,66,.1);color:#f5c842;border-color:rgba(245,200,66,.25)">Custom · Color-coded</div>
-      </div>
-    </div>
-
-    <div class="psec" id="ps">
-      <div class="pgrid">
-        <div class="pcard" id="p-crunchyroll" onclick="tog('crunchyroll')">
-          <div class="pdot" style="background:#F47521"></div>
-          <div class="pname">Crunchyroll</div><div class="psub">491 episodes</div>
-        </div>
-        <div class="pcard" id="p-netflix" onclick="tog('netflix')">
-          <div class="pdot" style="background:#E50914"></div>
-          <div class="pname">Netflix</div><div class="psub">45 episodes</div>
-        </div>
-        <div class="pcard" id="p-hidive" onclick="tog('hidive')">
-          <div class="pdot" style="background:#00B4DB"></div>
-          <div class="pname">HIDIVE</div><div class="psub">55 episodes</div>
-        </div>
-        <div class="pcard" id="p-manga" onclick="tog('manga')">
-          <div class="pdot" style="background:#4B6FDF"></div>
-          <div class="pname">Manga</div><div class="psub">11 release days</div>
-        </div>
-        <div class="pcard" id="p-manhwa" onclick="tog('manhwa')">
-          <div class="pdot" style="background:#8B5CF6"></div>
-          <div class="pname">Manhwa</div><div class="psub">5 release days</div>
-        </div>
-        <div class="pcard" id="p-manhua" onclick="tog('manhua')">
-          <div class="pdot" style="background:#10B981"></div>
-          <div class="pname">Manhua</div><div class="psub">4 release days</div>
-        </div>
-      </div>
-      <div class="pdiv"></div>
-    </div>
-
-    <button class="getbtn" id="gb" onclick="goStep3()" disabled>⚡ Get My Calendar Feed</button>
-    <div class="getnote">Free for Spring 2026 · Works with Apple Calendar, Google Calendar & more</div>
-  </div>
-
+<div class="hero">
+  <div class="hero-tag">Spring 2026 — Free Access</div>
+  <h1>Build Your Feed</h1>
+  <p>Pick everything or just the platforms you actually use. One link per feed — subscribe once, auto-updates forever.</p>
 </div>
+<div class="main">
+  <div class="step-label">Step 1 — Choose Your Setup</div>
+  <div class="option-grid">
+    <div class="option-card" id="card-master" onclick="selectMode('master')">
+      <div class="option-icon">⚡</div>
+      <div class="option-name">Everything</div>
+      <div class="option-desc">One feed. All anime (Crunchyroll, Netflix, HIDIVE), all manga, manhwa, and manhua. Simplest option.</div>
+      <div class="option-badge" style="background:rgba(0,212,170,.12);color:var(--teal);border:1px solid rgba(0,212,170,.3);">611 events · All platforms</div>
+    </div>
+    <div class="option-card" id="card-custom" onclick="selectMode('custom')">
+      <div class="option-icon">🎛️</div>
+      <div class="option-name">Pick My Feeds</div>
+      <div class="option-desc">Choose which platforms and content types you want. Add each as a separate calendar and color-code them.</div>
+      <div class="option-badge" style="background:rgba(245,200,66,.1);color:var(--gold);border:1px solid rgba(245,200,66,.3);">Your choice · Color-code each</div>
+    </div>
+  </div>
+
+  <div class="platform-section" id="plat-section">
+    <div class="step-label">Step 2 — Pick Your Platforms</div>
+    <div class="plat-grid">
+      <div class="plat-card" id="plat-crunchyroll" onclick="togglePlat('crunchyroll')">
+        <div class="plat-dot" style="background:#F47521;"></div>
+        <div class="plat-name">Crunchyroll</div>
+        <div class="plat-sub">491 episodes · Orange</div>
+      </div>
+      <div class="plat-card" id="plat-netflix" onclick="togglePlat('netflix')">
+        <div class="plat-dot" style="background:#E50914;"></div>
+        <div class="plat-name">Netflix</div>
+        <div class="plat-sub">45 episodes · Red</div>
+      </div>
+      <div class="plat-card" id="plat-hidive" onclick="togglePlat('hidive')">
+        <div class="plat-dot" style="background:#00B4DB;"></div>
+        <div class="plat-name">HIDIVE</div>
+        <div class="plat-sub">55 episodes · Blue</div>
+      </div>
+      <div class="plat-card" id="plat-manga" onclick="togglePlat('manga')">
+        <div class="plat-dot" style="background:#4B6FDF;"></div>
+        <div class="plat-name">Manga</div>
+        <div class="plat-sub">11 release days · Blue</div>
+      </div>
+      <div class="plat-card" id="plat-manhwa" onclick="togglePlat('manhwa')">
+        <div class="plat-dot" style="background:#8B5CF6;"></div>
+        <div class="plat-name">Manhwa</div>
+        <div class="plat-sub">5 release days · Purple</div>
+      </div>
+      <div class="plat-card" id="plat-manhua" onclick="togglePlat('manhua')">
+        <div class="plat-dot" style="background:#10B981;"></div>
+        <div class="plat-name">Manhua</div>
+        <div class="plat-sub">4 release days · Green</div>
+      </div>
+    </div>
+    <div class="divider"></div>
+  </div>
+
+  <div class="cta-wrap">
+    <button class="btn-get" onclick="generateFeeds()">⚡ Get My Calendar Feed</button>
+    <div class="cta-note">Free for Spring 2026 · Works with Apple Calendar, Google Calendar, Outlook &amp; more</div>
+  </div>
+
+  <div class="result-box" id="result-box">
+    <h2>Your Feeds Are Ready</h2>
+    <p>Add each link to your calendar app. Tap the Apple button for one-tap subscribe on iPhone/iPad/Mac. Google Calendar users: copy the link and add from URL on desktop.</p>
+    <div id="feed-list"></div>
+  </div>
+
+  <div class="guide-box">
+    <h2>How to Color-Code Your Calendar</h2>
+    <p>Your calendar app colors by subscription, not by event. Subscribe to separate feeds, then assign each one a different color in your app. Here's how:</p>
+    <div class="guide-tabs">
+      <button class="gtab active" onclick="showGuide('apple',this)">🍎 Apple Calendar</button>
+      <button class="gtab" onclick="showGuide('google',this)">Google Calendar</button>
+      <button class="gtab" onclick="showGuide('outlook',this)">Outlook</button>
+    </div>
+    <div class="gcontent active" id="guide-apple">
+      <div class="gsteps">
+        <div class="gstep"><div class="gnum">1</div><div class="gtext">Tap <strong>Get My Calendar Feed</strong> above and choose your feeds.</div></div>
+        <div class="gstep"><div class="gnum">2</div><div class="gtext">Tap the <strong>🍎 Add to Apple Calendar</strong> button — it opens Apple Calendar instantly.</div></div>
+        <div class="gstep"><div class="gnum">3</div><div class="gtext">Tap <strong>Subscribe</strong> when Apple Calendar prompts you.</div></div>
+        <div class="gstep"><div class="gnum">4</div><div class="gtext">Go to <strong>Calendars</strong> → tap ⓘ next to OtakuSync → tap <strong>Color</strong> to pick one.</div></div>
+        <div class="gstep"><div class="gnum">5</div><div class="gtext">Repeat for each platform feed. Assign each a different color — Crunchyroll orange, Netflix red, etc.</div></div>
+      </div>
+    </div>
+    <div class="gcontent" id="guide-google">
+      <div class="gsteps">
+        <div class="gstep"><div class="gnum">1</div><div class="gtext"><strong>Open Google Calendar on a desktop browser</strong> — the mobile app can't add URL subscriptions.</div></div>
+        <div class="gstep"><div class="gnum">2</div><div class="gtext">Click <strong>+ Other calendars</strong> → <strong>From URL</strong>.</div></div>
+        <div class="gstep"><div class="gnum">3</div><div class="gtext">Paste your OtakuSync feed URL and click <strong>Add calendar</strong>.</div></div>
+        <div class="gstep"><div class="gnum">4</div><div class="gtext">Click the three dots next to the new calendar → <strong>Edit</strong> → pick a color.</div></div>
+        <div class="gstep"><div class="gnum">5</div><div class="gtext">Repeat for each feed. Note: Google updates subscriptions roughly once per day, not instantly.</div></div>
+      </div>
+    </div>
+    <div class="gcontent" id="guide-outlook">
+      <div class="gsteps">
+        <div class="gstep"><div class="gnum">1</div><div class="gtext">Open <strong>Outlook on desktop</strong> (web or app).</div></div>
+        <div class="gstep"><div class="gnum">2</div><div class="gtext">Go to <strong>Calendar</strong> → <strong>Add calendar</strong> → <strong>Subscribe from web</strong>.</div></div>
+        <div class="gstep"><div class="gnum">3</div><div class="gtext">Paste your OtakuSync feed URL and click <strong>Import</strong>.</div></div>
+        <div class="gstep"><div class="gnum">4</div><div class="gtext">Right-click the new calendar → <strong>Color</strong> to assign one.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast">Copied!</div>
 <script>
-var email='', mode=null, sel=new Set();
+  var BASE = 'https://otakusync.net/feeds/';
+  var FEEDS = {
+    master:      {name:'Everything (All Platforms)', file:'master.ics',      dot:'#F47521'},
+    crunchyroll: {name:'Crunchyroll',                file:'crunchyroll.ics', dot:'#F47521'},
+    netflix:     {name:'Netflix',                    file:'netflix.ics',     dot:'#E50914'},
+    hidive:      {name:'HIDIVE',                     file:'hidive.ics',      dot:'#00B4DB'},
+    manga:       {name:'Manga & Light Novels',        file:'manga.ics',       dot:'#4B6FDF'},
+    manhwa:      {name:'Manhwa',                     file:'manhwa.ics',      dot:'#8B5CF6'},
+    manhua:      {name:'Manhua',                     file:'manhua.ics',      dot:'#10B981'},
+  };
+  var mode = null;
+  var selected = new Set();
 
-function setSteps(cur){
-  [1,2,3].forEach(function(i){
-    var n=document.getElementById('n'+i), l=document.getElementById('l'+i);
-    if(i<cur){n.className='s-num done';n.textContent='✓';l.className='s-lbl on';}
-    else if(i===cur){n.className='s-num on';l.className='s-lbl on';}
-    else{n.className='s-num';l.className='s-lbl';}
-  });
-}
-
-function goStep2(){
-  var inp=document.getElementById('ei');
-  var v=inp.value.trim();
-  var em=document.getElementById('em');
-  em.textContent='';
-  inp.classList.remove('err');
-  if(!v||!v.includes('@')||!v.includes('.')){
-    inp.classList.add('err');
-    em.textContent='Please enter a valid email address.';
-    return;
+  function selectMode(m) {
+    mode = m;
+    document.getElementById('card-master').classList.toggle('selected', m==='master');
+    document.getElementById('card-custom').classList.toggle('selected', m==='custom');
+    var ps = document.getElementById('plat-section');
+    ps.classList.toggle('active', m==='custom');
+    if(m==='master') selected.clear();
   }
-  email=v;
-  var btn=document.getElementById('eb');
-  btn.disabled=true;
-  btn.innerHTML='<span class="spin"></span>Saving...';
-  fetch('/api/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,feeds:['pending']})})
-    .catch(function(){})
-    .finally(function(){
-      btn.innerHTML='✓ Got it!';
-      setTimeout(function(){
-        document.getElementById('c1').classList.add('gone');
-        document.getElementById('c2').classList.remove('gone');
-        setSteps(2);
-        window.scrollTo({top:0,behavior:'smooth'});
-      },350);
+
+  function togglePlat(key) {
+    var el = document.getElementById('plat-'+key);
+    if(selected.has(key)){selected.delete(key);el.classList.remove('selected');}
+    else{selected.add(key);el.classList.add('selected');}
+  }
+
+  function isApple(){return /iPhone|iPad|iPod|Mac/i.test(navigator.userAgent);}
+
+  function generateFeeds() {
+    var keys = [];
+    if(mode==='master') keys = ['master'];
+    else if(mode==='custom') keys = Array.from(selected);
+    else { alert('Please choose a setup option above first.'); return; }
+    if(keys.length===0){ alert('Please select at least one feed.'); return; }
+
+    var list = document.getElementById('feed-list');
+    list.innerHTML = '';
+    keys.forEach(function(key){
+      var f = FEEDS[key];
+      var httpsUrl = BASE + f.file;
+      var webcalUrl = httpsUrl.replace('https://','webcal://');
+      var html = '<div class="feed-item">';
+      html += '<div class="feed-item-name"><span style="width:12px;height:12px;border-radius:50%;background:'+f.dot+';display:inline-block;"></span>'+f.name+'</div>';
+      html += '<div class="feed-url">'+httpsUrl+'</div>';
+      html += '<div class="feed-btns">';
+      if(isApple()) html += '<a class="fbtn fbtn-apple" href="'+webcalUrl+'">🍎 Add to Apple Calendar</a>';
+      html += '<button class="fbtn fbtn-copy" onclick="copyUrl(\''+httpsUrl+'\')">📋 Copy Link</button>';
+      html += '</div></div>';
+      list.innerHTML += html;
     });
-}
 
-function pick(m){
-  mode=m;
-  document.getElementById('mc-master').classList.toggle('sel',m==='master');
-  document.getElementById('mc-custom').classList.toggle('sel',m==='custom');
-  document.getElementById('ps').classList.toggle('show',m==='custom');
-  if(m==='master'){sel.clear();['crunchyroll','netflix','hidive','manga','manhwa','manhua'].forEach(function(k){document.getElementById('p-'+k).classList.remove('sel');});}
-  chkBtn();
-}
+    var box = document.getElementById('result-box');
+    box.classList.add('show');
+    box.scrollIntoView({behavior:'smooth',block:'start'});
+  }
 
-function tog(k){
-  var el=document.getElementById('p-'+k);
-  if(sel.has(k)){sel.delete(k);el.classList.remove('sel');}
-  else{sel.add(k);el.classList.add('sel');}
-  chkBtn();
-}
-
-function chkBtn(){
-  var ok=(mode==='master')||(mode==='custom'&&sel.size>0);
-  document.getElementById('gb').disabled=!ok;
-}
-
-function goStep3(){
-  var keys=mode==='master'?['master']:Array.from(sel);
-  if(!keys.length)return;
-  var btn=document.getElementById('gb');
-  btn.disabled=true;
-  btn.innerHTML='<span class="spin"></span>Building your feeds...';
-  fetch('/api/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,feeds:keys})})
-    .catch(function(){})
-    .finally(function(){
-      var p=new URLSearchParams();
-      p.set('email',email);
-      keys.forEach(function(k){p.append('feed',k);});
-      window.location.href='/thankyou?'+p.toString();
+  function copyUrl(url) {
+    navigator.clipboard.writeText(url).catch(function(){
+      var t=document.createElement('textarea'); t.value=url;
+      document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t);
     });
-}
+    var toast=document.getElementById('toast'); toast.style.display='block';
+    setTimeout(function(){toast.style.display='none';},2000);
+  }
 
-document.getElementById('ei').addEventListener('keydown',function(e){if(e.key==='Enter')goStep2();});
+  function showGuide(id, btn) {
+    document.querySelectorAll('.gcontent').forEach(function(el){el.classList.remove('active');});
+    document.querySelectorAll('.gtab').forEach(function(el){el.classList.remove('active');});
+    document.getElementById('guide-'+id).classList.add('active');
+    btn.classList.add('active');
+  }
 </script>
 </body>
 </html>
